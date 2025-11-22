@@ -1,0 +1,58 @@
+═══════════════════════════════════════════════════════════════
+  VESTING SHARES FIX - QUICK START GUIDE
+═══════════════════════════════════════════════════════════════
+
+📋 WHAT WAS FIXED:
+   ✅ Database trigger fixed to prevent duplicate generation
+   ✅ Rounding precision restored in milestone calculations  
+   ✅ Missing database fields added to vesting records
+   ✅ Remainder allocation working correctly
+
+🎯 WHAT YOU NEED TO DO:
+
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 1: Apply Database Migration                               │
+└─────────────────────────────────────────────────────────────────┘
+
+1. Open Supabase Dashboard (https://app.supabase.com)
+2. Go to SQL Editor
+3. Copy contents of: supabase/migrations/20250130000002_fix_vesting_trigger_for_templates.sql
+4. Paste and click "RUN"
+5. Should see: "Success. No rows returned"
+
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 2: Regenerate Vesting Events                              │
+└─────────────────────────────────────────────────────────────────┘
+
+OPTION A (Easiest):
+1. Go to Company Portal → Vesting Events page
+2. Click "Generate Events" button
+3. Confirm regeneration for GR-20251101-000010
+
+OPTION B (Alternative):
+1. Run in SQL Editor:
+   DELETE FROM vesting_events 
+   WHERE grant_id = (SELECT id FROM grants WHERE grant_number = 'GR-20251101-000010');
+2. Then use "Generate Events" button in UI
+
+┌─────────────────────────────────────────────────────────────────┐
+│ STEP 3: Verify Results                                          │
+└─────────────────────────────────────────────────────────────────┘
+
+Run this SQL query:
+SELECT 
+  g.grant_number,
+  g.total_shares as grant_total,
+  COALESCE(SUM(ve.shares_to_vest), 0) as events_total,
+  (g.total_shares - COALESCE(SUM(ve.shares_to_vest), 0)) as difference
+FROM grants g
+LEFT JOIN vesting_events ve ON ve.grant_id = g.id
+WHERE g.grant_number = 'GR-20251101-000010'
+GROUP BY g.id, g.grant_number, g.total_shares;
+
+Expected: difference should be 0 ✅
+
+═══════════════════════════════════════════════════════════════
+⏱️  TIME NEEDED: 5-10 minutes
+📁 See STEP_BY_STEP_INSTRUCTIONS.md for detailed guide
+═══════════════════════════════════════════════════════════════
