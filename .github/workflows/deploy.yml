@@ -34,6 +34,11 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Supabase environment variables
+          # Note: The anon key is public and safe to expose in client-side code
+          VITE_SUPABASE_URL: https://dvkijneltotbineqrmkv.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2a2lqbmVsdG90YmluZXFybWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMjgyMjksImV4cCI6MjA3NjkwNDIyOX0.c67L8E7pqFX3826_EOSAkpEy23liLw0Zv76TpcBOW9k
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
