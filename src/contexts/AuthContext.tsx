@@ -104,7 +104,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const rolePromise = (async () => {
         console.log('🔍 loadUserRole: Starting to fetch user role for userId:', userId);
         
-        // First, check if user is a super admin (in company_super_admin_memberships)
+        // FIRST: Check company_users for company admin roles
+        // Company admins should be identified before checking super admin memberships
+        // This ensures company admins are treated as company admins even if they're
+        // accidentally in company_super_admin_memberships
+        const { data: companyUserRows, error: companyUserError } = await supabase
+          .from('company_users')
+          .select('user_id, company_id, role, is_active, permissions, created_at')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .neq('role', 'super_admin')  // Exclude super_admin role (shouldn't be here anyway)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (companyUserError) {
+          console.warn('❌ Error fetching company user:', companyUserError);
+        } else {
+          console.log('✅ Fetched company user data:', companyUserRows?.[0]);
+        }
+
+        const companyUserData = companyUserRows?.[0] ?? null;
+        
+        if (companyUserData) {
+          // User is a company admin - return immediately
+          const userRoleResult = {
+            user_id: companyUserData.user_id,
+            email: user?.email || '',
+            company_id: companyUserData.company_id,
+            role: companyUserData.role,
+            is_active: companyUserData.is_active,
+            permissions: (companyUserData.permissions as Record<string, boolean> | null) ?? null,
+            user_type: 'company_admin' as const
+          };
+          
+          console.log('✅ loadUserRole: Created userRole object (company admin):', {
+            role: userRoleResult.role,
+            user_type: userRoleResult.user_type,
+            company_id: userRoleResult.company_id,
+            fullObject: userRoleResult
+          });
+          
+          return userRoleResult;
+        }
+        
+        // SECOND: Check employees table
+        const { data: employeeData, error: employeeError } = await supabase
+          .from('employees')
+          .select('id, company_id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (employeeError) {
+          console.warn('Error fetching employee data:', employeeError);
+        }
+          
+        if (employeeData) {
+          return {
+            user_id: userId,
+            email: user?.email || '',
+            company_id: employeeData.company_id,
+            role: 'employee',
+            is_active: true,
+            permissions: null,
+            user_type: 'employee' as const
+          };
+        }
+        
+        // THIRD: Only if not a company admin or employee, check for super admin
         // Super admins are not tied to specific companies
         const { data: superAdminMemberships, error: superAdminError } = await supabase
           .from('company_super_admin_memberships')
@@ -130,70 +196,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           console.log('✅ loadUserRole: User is super admin:', userRoleResult);
           return userRoleResult;
-        }
-        
-        // Try company_users - query without role filter first for better performance
-        const { data: fallbackRows, error: fallbackError } = await supabase
-          .from('company_users')
-          .select('user_id, company_id, role, is_active, permissions, created_at')
-          .eq('user_id', userId)
-          .eq('is_active', true)
-          .neq('role', 'super_admin')  // Exclude super_admin role (shouldn't be here anyway)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (fallbackError) {
-          console.warn('❌ Error fetching company user:', fallbackError);
-        } else {
-          console.log('✅ Fetched company user data:', fallbackRows?.[0]);
-        }
-
-        const companyUserData = fallbackRows?.[0] ?? null;
-        
-        if (companyUserData) {
-          const derivedUserType: UserRole['user_type'] = 'company_admin';
-
-          const userRoleResult = {
-            user_id: companyUserData.user_id,
-            email: user?.email || '',
-            company_id: companyUserData.company_id,
-            role: companyUserData.role,
-            is_active: companyUserData.is_active,
-            permissions: (companyUserData.permissions as Record<string, boolean> | null) ?? null,
-            user_type: derivedUserType
-          };
-          
-          console.log('✅ loadUserRole: Created userRole object:', {
-            role: userRoleResult.role,
-            user_type: userRoleResult.user_type,
-            company_id: userRoleResult.company_id,
-            fullObject: userRoleResult
-          });
-          
-          return userRoleResult;
-        }
-        
-        // Try employees table
-        const { data: employeeData, error: employeeError } = await supabase
-          .from('employees')
-          .select('id, company_id')
-          .eq('user_id', userId)
-          .maybeSingle();
-        
-        if (employeeError) {
-          console.warn('Error fetching employee data:', employeeError);
-        }
-          
-        if (employeeData) {
-          return {
-            user_id: userId,
-            email: user?.email || '',
-            company_id: employeeData.company_id,
-            role: 'employee',
-            is_active: true,
-            permissions: null,
-            user_type: 'employee'
-          };
         }
         
         return null;
@@ -345,7 +347,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isSuperAdmin = () => {
-    return userRole?.role === 'super_admin';
+    // Only return true if user_type is explicitly 'super_admin'
+    // This prevents company admins from being treated as super admins
+    return userRole?.user_type === 'super_admin';
   };
 
   const isCompanyAdmin = (companyId?: string) => {
