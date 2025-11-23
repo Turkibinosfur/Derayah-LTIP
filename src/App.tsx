@@ -37,6 +37,7 @@ const OperatorSubscriptions = lazy(() => import('./pages/OperatorSubscriptions')
 const OperatorBuybackRequests = lazy(() => import('./pages/OperatorBuybackRequests'));
 const OperatorPortfolios = lazy(() => import('./pages/OperatorPortfolios'));
 const Translations = lazy(() => import('./pages/Translations'));
+const CustomerJourney = lazy(() => import('./pages/CustomerJourney'));
 
 // Loading component
 const PageLoader = () => (
@@ -140,6 +141,20 @@ function AuthenticatedRoute({ children }: { children: React.ReactNode }) {
 
 function AppContent() {
   const { i18n } = useTranslation();
+
+  useEffect(() => {
+    // Handle GitHub Pages 404 redirect
+    // When GitHub Pages serves 404.html, it includes the path as a query parameter
+    // This code extracts it and updates the URL so React Router can handle it
+    const path = window.location.search.slice(1);
+    if (path && window.history.replaceState) {
+      // Decode the path (GitHub Pages replaces & with ~and~)
+      const decoded = path.split('&').map(function(s) { 
+        return s.replace(/~and~/g, '&')
+      }).join('?');
+      window.history.replaceState(null, '', decoded);
+    }
+  }, []);
 
   useEffect(() => {
     // Set document direction and language on mount and language change
@@ -311,6 +326,14 @@ function AppContent() {
               <SuperAdminProtectedRoute>
                 <Translations />
               </SuperAdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/customer-journey"
+            element={
+              <ProtectedRoute>
+                <CustomerJourney />
+              </ProtectedRoute>
             }
           />
           <Route path="/employee/login" element={<EmployeeLogin />} />
