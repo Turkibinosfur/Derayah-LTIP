@@ -147,6 +147,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return userRoleResult;
         }
         
+        // Check if user has ANY company_users entry (including role='super_admin')
+        // If they do, they are a company-level user, NOT a platform super admin
+        const { data: anyCompanyUser, error: anyCompanyUserError } = await supabase
+          .from('company_users')
+          .select('user_id, company_id, role, is_active, permissions')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .limit(1);
+
+        if (anyCompanyUserError) {
+          console.warn('❌ Error checking for any company user:', anyCompanyUserError);
+        }
+
+        // If user has ANY active company_users entry, they are a company-level user
+        // Even if their role is 'super_admin' in company_users, they are NOT a platform super admin
+        if (anyCompanyUser && anyCompanyUser.length > 0) {
+          const companyUser = anyCompanyUser[0];
+          console.log('✅ User has company_users entry (including role=' + companyUser.role + '), treating as company-level admin, not platform super admin');
+          
+          // Return as company_admin, even if role is 'super_admin' in company_users
+          // This ensures they don't see operator navigation
+          return {
+            user_id: companyUser.user_id,
+            email: user?.email || '',
+            company_id: companyUser.company_id,
+            role: companyUser.role,
+            is_active: companyUser.is_active,
+            permissions: (companyUser.permissions as Record<string, boolean> | null) ?? null,
+            user_type: 'company_admin' as const  // Always company_admin, not super_admin
+          };
+        }
+        
         // SECOND: Check employees table
         const { data: employeeData, error: employeeError } = await supabase
           .from('employees')
@@ -170,8 +202,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         }
         
-        // THIRD: Only if not a company admin or employee, check for super admin
-        // Super admins are not tied to specific companies
+        // THIRD: Before checking for platform super admin, double-check if user exists in company_users
+        // (even if inactive) - if they do, they should be treated as company admin, not platform super admin
+        const { data: anyCompanyUserCheck, error: anyCompanyUserCheckError } = await supabase
+          .from('company_users')
+          .select('user_id, company_id, role, is_active, permissions')
+          .eq('user_id', userId)
+          .limit(1);
+
+        if (anyCompanyUserCheckError) {
+          console.warn('❌ Error checking for any company user (final check):', anyCompanyUserCheckError);
+        }
+
+        // If user exists in company_users at all (even if inactive), they are a company-level user
+        // This prevents company admins from being treated as platform super admins
+        if (anyCompanyUserCheck && anyCompanyUserCheck.length > 0) {
+          const companyUser = anyCompanyUserCheck[0];
+          console.log('✅ User exists in company_users (even if inactive), treating as company admin, not platform super admin');
+          
+          return {
+            user_id: companyUser.user_id,
+            email: user?.email || '',
+            company_id: companyUser.company_id,
+            role: companyUser.role,
+            is_active: companyUser.is_active,
+            permissions: (companyUser.permissions as Record<string, boolean> | null) ?? null,
+            user_type: 'company_admin' as const  // Always company_admin, not super_admin
+          };
+        }
+
+        // FOURTH: Only if not a company user or employee, check for platform super admin
+        // Platform super admins are NOT tied to specific companies
+
         const { data: superAdminMemberships, error: superAdminError } = await supabase
           .from('company_super_admin_memberships')
           .select('user_id')
