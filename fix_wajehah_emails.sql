@@ -1,4 +1,4 @@
--- Fix wajehah.com@gmail.com and wajehah.sa@gmail.com employee records
+-- Fix wajehah.com@gmail.com and employee@example.com employee records
 -- Run this SQL directly in your Supabase SQL Editor
 
 DO $$
@@ -17,7 +17,7 @@ BEGIN
     RETURN;
   END IF;
   
-  RAISE NOTICE 'Fixing wajehah.com@gmail.com and wajehah.sa@gmail.com employee records...';
+  RAISE NOTICE 'Fixing wajehah.com@gmail.com and employee@example.com employee records...';
   
   -- Check if wajehah.com@gmail.com exists
   SELECT id INTO v_employee_id
@@ -99,14 +99,14 @@ BEGIN
     END IF;
   END IF;
   
-  -- Check if wajehah.sa@gmail.com exists
+  -- Check if employee@example.com exists
   SELECT id INTO v_employee_id
   FROM employees
-  WHERE email = 'wajehah.sa@gmail.com'
+  WHERE email = 'employee@example.com'
   AND company_id = v_company_id;
   
   IF v_employee_id IS NOT NULL THEN
-    RAISE NOTICE 'wajehah.sa@gmail.com already exists: %', v_employee_id;
+    RAISE NOTICE 'employee@example.com already exists: %', v_employee_id;
     
     -- Enable portal access
     UPDATE employees
@@ -115,9 +115,9 @@ BEGIN
         portal_password = 'WajehahSa123!'
     WHERE id = v_employee_id;
     
-    RAISE NOTICE 'Enabled portal access for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Enabled portal access for employee@example.com';
   ELSE
-    RAISE NOTICE 'wajehah.sa@gmail.com not found, creating employee record...';
+    RAISE NOTICE 'employee@example.com not found, creating employee record...';
     
     -- Find any existing employee to update (different from wajehah.com)
     SELECT id INTO v_employee_id
@@ -127,9 +127,9 @@ BEGIN
     LIMIT 1;
     
     IF v_employee_id IS NOT NULL THEN
-      -- Update existing employee with wajehah.sa@gmail.com
+      -- Update existing employee with employee@example.com
       UPDATE employees
-      SET email = 'wajehah.sa@gmail.com',
+      SET email = 'employee@example.com',
           first_name_en = 'Fatima',
           last_name_en = 'Al-Zahrani',
           portal_access_enabled = true,
@@ -137,7 +137,7 @@ BEGIN
           portal_password = 'WajehahSa123!'
       WHERE id = v_employee_id;
       
-      RAISE NOTICE 'Updated employee % with wajehah.sa@gmail.com', v_employee_id;
+      RAISE NOTICE 'Updated employee % with employee@example.com', v_employee_id;
     ELSE
       -- Create new employee
       INSERT INTO employees (
@@ -162,7 +162,7 @@ BEGIN
         v_company_id,
         'EMP-FATIMA-001',
         '1234567891',
-        'wajehah.sa@gmail.com',
+        'employee@example.com',
         'Fatima',
         'Al-Zahrani',
         'Finance',
@@ -176,7 +176,7 @@ BEGIN
         now()
       ) RETURNING id INTO v_employee_id;
       
-      RAISE NOTICE 'Created new employee record for wajehah.sa@gmail.com: %', v_employee_id;
+      RAISE NOTICE 'Created new employee record for employee@example.com: %', v_employee_id;
     END IF;
   END IF;
   
@@ -185,7 +185,7 @@ BEGIN
   FOR v_employee_id IN 
     SELECT id, first_name_en, last_name_en, email, portal_access_enabled, portal_username, portal_password
     FROM employees 
-    WHERE email IN ('wajehah.com@gmail.com', 'wajehah.sa@gmail.com')
+    WHERE email IN ('wajehah.com@gmail.com', 'employee@example.com')
     AND company_id = v_company_id
   LOOP
     RAISE NOTICE 'ID: %, Name: % %, Email: %, Portal Access: %, Username: %, Password: %', 
@@ -214,5 +214,5 @@ FROM employees
 WHERE company_id = (
   SELECT id FROM companies WHERE company_name_en = 'Derayah Financial'
 )
-AND email IN ('wajehah.com@gmail.com', 'wajehah.sa@gmail.com')
+AND email IN ('wajehah.com@gmail.com', 'employee@example.com')
 ORDER BY email;

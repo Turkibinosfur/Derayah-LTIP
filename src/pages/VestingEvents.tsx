@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   getAllVestingEvents,
   getUpcomingVestingEvents, 
@@ -61,6 +62,8 @@ interface VestingEventStats {
 }
 
 export default function VestingEvents() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [vestingEvents, setVestingEvents] = useState<VestingEventWithDetails[]>([]);
   const [stats, setStats] = useState<VestingEventStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -755,32 +758,32 @@ export default function VestingEvents() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            Vesting Events
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {t('vestingEvents.title')}
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
               {vestingEvents.length}
             </span>
           </h1>
-          <p className="text-gray-600 mt-1">Manage and process vesting events for all grants</p>
+          <p className="text-gray-600 mt-1">{t('vestingEvents.description')}</p>
         </div>
-        <div className="flex gap-3">
+        <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <button 
             onClick={() => {
               loadGrantsWithoutEvents();
               setShowGenerateModal(true);
             }}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className={`flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition ${isRTL ? 'space-x-reverse' : ''}`}
           >
             <TrendingUp className="w-4 h-4" />
-            <span>Generate Events</span>
+            <span>{t('vestingEvents.generateEvents')}</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          <button className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${isRTL ? 'space-x-reverse' : ''}`}>
             <Download className="w-4 h-4" />
-            <span>Export</span>
+            <span>{t('vestingEvents.export')}</span>
           </button>
         </div>
       </div>
@@ -791,7 +794,7 @@ export default function VestingEvents() {
           <div 
             onClick={() => setStatsCollapsed(!statsCollapsed)}
             className="px-4 py-3 border-b border-gray-200 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition"
-            title={statsCollapsed ? 'Expand' : 'Collapse'}
+            title={statsCollapsed ? t('vestingEvents.expand') : t('vestingEvents.collapse')}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
@@ -801,7 +804,7 @@ export default function VestingEvents() {
               }
             }}
           >
-            <h2 className="text-sm font-semibold text-gray-900">Summary</h2>
+            <h2 className="text-sm font-semibold text-gray-900">{t('vestingEvents.summary')}</h2>
             <div className="text-gray-500">
               {statsCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
             </div>
@@ -812,11 +815,11 @@ export default function VestingEvents() {
               className="bg-white rounded-lg p-4 border border-gray-200 cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition"
               onClick={() => setSelectedStatus('all')}
               role="button"
-              title="Show all events"
+              title={t('vestingEvents.showAllEvents')}
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Events</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.totalEvents')}</p>
                   <p className="text-xl font-bold text-gray-900">{stats.total_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_total_shares)} shares</p>
               </div>
@@ -832,7 +835,7 @@ export default function VestingEvents() {
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Due Now</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.dueNow')}</p>
                   <p className="text-xl font-bold text-red-600">{stats.due_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_due_shares)} shares</p>
               </div>
@@ -848,7 +851,7 @@ export default function VestingEvents() {
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Pending</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.pending')}</p>
                   <p className="text-xl font-bold text-yellow-600">{stats.pending_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_pending_shares)} shares</p>
               </div>
@@ -864,7 +867,7 @@ export default function VestingEvents() {
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Transferred</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.transferred')}</p>
                   <p className="text-xl font-bold text-green-600">{stats.transferred_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_transferred_shares)} shares</p>
               </div>
@@ -880,7 +883,7 @@ export default function VestingEvents() {
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Exercised</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.exercised')}</p>
                   <p className="text-xl font-bold text-purple-600">{stats.exercised_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_exercised_shares)} shares</p>
               </div>
@@ -896,7 +899,7 @@ export default function VestingEvents() {
             >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Vested</p>
+                <p className="text-sm text-gray-600">{t('vestingEvents.vested')}</p>
                   <p className="text-xl font-bold text-blue-600">{stats.vested_events}</p>
                 <p className="text-xs text-gray-500">{formatShares(stats.total_vested_shares)} shares</p>
               </div>
@@ -932,7 +935,7 @@ export default function VestingEvents() {
             <div 
               onClick={() => setEventsChartExpanded(!eventsChartExpanded)}
               className="p-4 border-b border-gray-200 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition"
-              title={eventsChartExpanded ? "Collapse legend" : "Expand legend"}
+              title={eventsChartExpanded ? t('vestingEvents.collapseLegend') : t('vestingEvents.expandLegend')}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -944,7 +947,7 @@ export default function VestingEvents() {
             >
               <div className="flex items-center space-x-2">
                 <PieChart className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Events by Status</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('vestingEvents.eventsByStatus')}</h3>
               </div>
               <div className="text-gray-500">
                 {eventsChartExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -953,11 +956,11 @@ export default function VestingEvents() {
             <div className="p-4">
               {(() => {
                 const eventsData = [
-                  { label: 'Due Now', value: stats.due_events, color: '#ef4444' },
-                  { label: 'Pending', value: stats.pending_events, color: '#f59e0b' },
-                  { label: 'Transferred', value: stats.transferred_events, color: '#10b981' },
-                  { label: 'Exercised', value: stats.exercised_events, color: '#8b5cf6' },
-                  { label: 'Vested', value: stats.vested_events, color: '#06b6d4' },
+                  { label: t('vestingEvents.dueNow'), value: stats.due_events, color: '#ef4444' },
+                  { label: t('vestingEvents.pending'), value: stats.pending_events, color: '#f59e0b' },
+                  { label: t('vestingEvents.transferred'), value: stats.transferred_events, color: '#10b981' },
+                  { label: t('vestingEvents.exercised'), value: stats.exercised_events, color: '#8b5cf6' },
+                  { label: t('vestingEvents.vested'), value: stats.vested_events, color: '#06b6d4' },
                   { label: 'Forfeited/Cancelled', value: stats.forfeited_events + stats.cancelled_events, color: '#6b7280' },
                 ].filter(d => d.value > 0);
                 
@@ -1598,7 +1601,7 @@ export default function VestingEvents() {
       {/* Vesting Events Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Vesting Events</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('vestingEvents.title')}</h3>
         </div>
 
         {vestingEvents.length > 0 ? (

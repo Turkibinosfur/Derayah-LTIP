@@ -16,9 +16,9 @@ WHERE company_id = (
 ORDER BY first_name_en;
 
 -- Now let's fix the issue by updating an existing employee or creating a new one
--- This will ensure wajehah.sa@gmail.com has an employee record with portal access
+-- This will ensure employee@example.com has an employee record with portal access
 
--- Step 1: Check if any employee with wajehah.sa@gmail.com exists
+-- Step 1: Check if any employee with employee@example.com exists
 DO $$
 DECLARE
   v_employee_id uuid;
@@ -34,14 +34,14 @@ BEGIN
     RETURN;
   END IF;
   
-  -- Check if employee with wajehah.sa@gmail.com already exists
+  -- Check if employee with employee@example.com already exists
   SELECT id INTO v_employee_id
   FROM employees
-  WHERE email = 'wajehah.sa@gmail.com'
+  WHERE email = 'employee@example.com'
   AND company_id = v_company_id;
   
   IF v_employee_id IS NOT NULL THEN
-    RAISE NOTICE 'Employee with wajehah.sa@gmail.com already exists: %', v_employee_id;
+    RAISE NOTICE 'Employee with employee@example.com already exists: %', v_employee_id;
     
     -- Enable portal access
     UPDATE employees
@@ -52,7 +52,7 @@ BEGIN
     
     RAISE NOTICE 'Enabled portal access for existing employee';
   ELSE
-    RAISE NOTICE 'No employee with wajehah.sa@gmail.com found, creating new one...';
+    RAISE NOTICE 'No employee with employee@example.com found, creating new one...';
     
     -- Find any existing employee to update
     SELECT id INTO v_employee_id
@@ -63,7 +63,7 @@ BEGIN
     IF v_employee_id IS NOT NULL THEN
       -- Update existing employee
       UPDATE employees
-      SET email = 'wajehah.sa@gmail.com',
+      SET email = 'employee@example.com',
           first_name_en = 'Fatima',
           last_name_en = 'Al-Zahrani',
           portal_access_enabled = true,
@@ -71,7 +71,7 @@ BEGIN
           portal_password = 'Wajehah123!'
       WHERE id = v_employee_id;
       
-      RAISE NOTICE 'Updated existing employee % with wajehah.sa@gmail.com', v_employee_id;
+      RAISE NOTICE 'Updated existing employee % with employee@example.com', v_employee_id;
     ELSE
       -- Create new employee
       INSERT INTO employees (
@@ -96,7 +96,7 @@ BEGIN
         v_company_id,
         'EMP-FATIMA-001',
         '1234567890',
-        'wajehah.sa@gmail.com',
+        'employee@example.com',
         'Fatima',
         'Al-Zahrani',
         'Finance',
@@ -115,11 +115,11 @@ BEGIN
   END IF;
   
   -- Verify the result
-  RAISE NOTICE 'Verification - Employee with wajehah.sa@gmail.com:';
+  RAISE NOTICE 'Verification - Employee with employee@example.com:';
   FOR v_employee_id IN 
     SELECT id, first_name_en, last_name_en, email, portal_access_enabled, portal_username
     FROM employees 
-    WHERE email = 'wajehah.sa@gmail.com'
+    WHERE email = 'employee@example.com'
     AND company_id = v_company_id
   LOOP
     RAISE NOTICE 'ID: %, Name: % %, Email: %, Portal Access: %, Username: %', 

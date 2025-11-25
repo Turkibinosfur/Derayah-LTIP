@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { Calendar, Plus, Edit, Trash2, Clock, TrendingUp, Zap, CheckCircle } from 'lucide-react';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface VestingSchedule {
   id: string;
@@ -39,6 +40,7 @@ interface PerformanceMetric {
 export default function VestingSchedules() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { brandColor } = useCompanyColor();
   const [schedules, setSchedules] = useState<VestingSchedule[]>([]);
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [loading, setLoading] = useState(true);
@@ -386,12 +388,15 @@ export default function VestingSchedules() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-2xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
             {t('vestingSchedules.title')}
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
+            <span 
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white text-lg font-semibold"
+              style={{ backgroundColor: brandColor }}
+            >
               {schedules.length}
             </span>
           </h1>
@@ -401,7 +406,17 @@ export default function VestingSchedules() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className={`flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition ${isRTL ? 'space-x-reverse' : ''}`}
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
         >
           <Plus className="w-4 h-4" />
           <span>{t('vestingSchedules.createSchedule')}</span>
@@ -510,7 +525,17 @@ export default function VestingSchedules() {
           <p className="text-gray-600 mb-6">{t('vestingSchedules.createFirstSchedule')}</p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="inline-flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition"
+            style={{ backgroundColor: brandColor }}
+            onMouseEnter={(e) => {
+              const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+              const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+              const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+              e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = brandColor;
+            }}
           >
             <Plus className="w-4 h-4" />
             <span>{t('vestingSchedules.createSchedule')}</span>
@@ -641,7 +666,17 @@ export default function VestingSchedules() {
                     </button>
                     <button
                       onClick={addMilestone}
-                      className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                      className="px-3 py-1 text-sm text-white rounded-lg transition"
+                      style={{ backgroundColor: brandColor }}
+                      onMouseEnter={(e) => {
+                        const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                        const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                        const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                        e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = brandColor;
+                      }}
                     >
                       Add Milestone
                     </button>
@@ -761,7 +796,19 @@ export default function VestingSchedules() {
               <button
                 onClick={handleCreateSchedule}
                 disabled={!newSchedule.name || totalPercentage !== 100 || milestones.length === 0}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                    const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                    const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                    e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Create Schedule
               </button>
@@ -882,7 +929,17 @@ export default function VestingSchedules() {
             <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                className="w-full px-4 py-2 text-white rounded-lg transition font-medium"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Close
               </button>

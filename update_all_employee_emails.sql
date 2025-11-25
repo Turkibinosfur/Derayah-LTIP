@@ -36,9 +36,9 @@ BEGIN
   
   RAISE NOTICE 'Updating all employee emails for Derayah Financial...';
   
-  -- Update Sarah Al-Mansouri to wajehah.sa@gmail.com
+  -- Update Sarah Al-Mansouri to employee@example.com
   UPDATE employees
-  SET email = 'wajehah.sa@gmail.com',
+  SET email = 'employee@example.com',
       portal_access_enabled = true,
       portal_username = 'wajehah.sa',
       portal_password = 'Wajehah123!'
@@ -48,7 +48,7 @@ BEGIN
   
   IF FOUND THEN
     v_employee_count := v_employee_count + 1;
-    RAISE NOTICE 'Updated Sarah Al-Mansouri to wajehah.sa@gmail.com';
+    RAISE NOTICE 'Updated Sarah Al-Mansouri to employee@example.com';
   END IF;
   
   -- Update Khalid Al-Zahrani to khalid.zahrani@gmail.com

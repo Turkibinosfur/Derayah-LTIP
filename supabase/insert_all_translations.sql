@@ -38,7 +38,8 @@ VALUES
 ('common.incentivePlans', 'en', 'Incentive Plans', 'translation'),
 ('common.subscriptions', 'en', 'Subscriptions', 'translation'),
 ('common.buybackRequests', 'en', 'Buyback Requests', 'translation'),
-('common.allPortfolios', 'en', 'All Portfolios', 'translation')
+('common.allPortfolios', 'en', 'All Portfolios', 'translation'),
+('common.customerJourney', 'en', 'Customer Journey', 'translation')
 ON CONFLICT (translation_key, language_code, namespace) 
 DO UPDATE SET translation_value = EXCLUDED.translation_value;
 
@@ -75,7 +76,8 @@ VALUES
 ('common.incentivePlans', 'ar', 'خطط الحوافز', 'translation'),
 ('common.subscriptions', 'ar', 'الاشتراكات', 'translation'),
 ('common.buybackRequests', 'ar', 'طلبات إعادة الشراء', 'translation'),
-('common.allPortfolios', 'ar', 'جميع المحافظ', 'translation')
+('common.allPortfolios', 'ar', 'جميع المحافظ', 'translation'),
+('common.customerJourney', 'ar', 'رحلة العميل', 'translation')
 ON CONFLICT (translation_key, language_code, namespace) 
 DO UPDATE SET translation_value = EXCLUDED.translation_value;
 

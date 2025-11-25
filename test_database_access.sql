@@ -1,4 +1,4 @@
--- Test Database Access for wajehah.sa@gmail.com
+-- Test Database Access for employee@example.com
 -- This script tests if the database queries work properly
 
 -- 1. Test basic connection
@@ -12,14 +12,14 @@ SELECT
 SELECT 
   '=== AUTH USERS ACCESS TEST ===' as test,
   COUNT(*) as total_users,
-  COUNT(CASE WHEN email = 'wajehah.sa@gmail.com' THEN 1 END) as target_user_exists
+  COUNT(CASE WHEN email = 'employee@example.com' THEN 1 END) as target_user_exists
 FROM auth.users;
 
 -- 3. Test employees table access
 SELECT 
   '=== EMPLOYEES TABLE ACCESS TEST ===' as test,
   COUNT(*) as total_employees,
-  COUNT(CASE WHEN email = 'wajehah.sa@gmail.com' THEN 1 END) as target_employee_exists
+  COUNT(CASE WHEN email = 'employee@example.com' THEN 1 END) as target_employee_exists
 FROM employees;
 
 -- 4. Test companies table access
@@ -37,7 +37,7 @@ SELECT
       SELECT 1 
       FROM employees e 
       WHERE e.user_id = (
-        SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+        SELECT id FROM auth.users WHERE email = 'employee@example.com'
       )
     ) 
     THEN 'Query should work' 
@@ -60,7 +60,7 @@ BEGIN
   -- Get auth user ID
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com'
+  WHERE email = 'employee@example.com'
   LIMIT 1;
   
   IF v_company_id IS NULL OR v_auth_user_id IS NULL THEN
@@ -136,5 +136,5 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );

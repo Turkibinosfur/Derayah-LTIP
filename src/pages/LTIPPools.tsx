@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/dateUtils';
 import { Plus, Users, TrendingUp, DollarSign, MoreVertical, Edit, Trash2, Eye, Layers, PieChart, ChevronDown, ChevronUp } from 'lucide-react';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface LTIPPool {
   id: string;
@@ -29,6 +30,7 @@ interface IncentivePlan {
 export default function LTIPPools() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { brandColor, getBgColor } = useCompanyColor();
   const [pools, setPools] = useState<LTIPPool[]>([]);
   const [grantedByPool, setGrantedByPool] = useState<Record<string, number>>({});
   const [vestedByPool, setVestedByPool] = useState<Record<string, number>>({});
@@ -492,12 +494,15 @@ export default function LTIPPools() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
             {t('ltipPools.title')}
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
+            <span 
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white text-lg font-semibold"
+              style={{ backgroundColor: brandColor }}
+            >
               {pools.length}
             </span>
           </h1>
@@ -507,7 +512,17 @@ export default function LTIPPools() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className={`flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition ${isRTL ? 'space-x-reverse' : ''}`}
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
         >
           <Plus className="w-4 h-4" />
           <span className="font-medium">{t('ltipPools.createPool')}</span>
@@ -518,8 +533,11 @@ export default function LTIPPools() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Layers className="w-6 h-6 text-blue-600" />
+            <div 
+              className="p-3 rounded-lg"
+              style={{ backgroundColor: getBgColor('100') }}
+            >
+              <Layers className="w-6 h-6" style={{ color: brandColor }} />
             </div>
             <span className="text-2xl font-bold text-gray-900">{pools.length}</span>
           </div>
@@ -1230,7 +1248,17 @@ export default function LTIPPools() {
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center space-x-2 px-6 py-3 text-white rounded-lg transition"
+              style={{ backgroundColor: brandColor }}
+              onMouseEnter={(e) => {
+                const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = brandColor;
+              }}
             >
               <Plus className="w-5 h-5" />
               <span className="font-medium">{t('ltipPools.createFirstPoolButton')}</span>
@@ -1323,8 +1351,11 @@ export default function LTIPPools() {
                         <div className="flex items-center">
                           <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                             <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${Math.min(utilizationPercent, 100)}%` }}
+                              className="h-2 rounded-full" 
+                              style={{ 
+                                width: `${Math.min(utilizationPercent, 100)}%`,
+                                backgroundColor: brandColor
+                              }}
                             ></div>
                           </div>
                           <span className="text-xs text-gray-600">
@@ -1504,7 +1535,17 @@ export default function LTIPPools() {
               </button>
               <button
                 onClick={handleCreatePool}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 {t('ltipPools.createPool')}
               </button>
@@ -1523,9 +1564,15 @@ export default function LTIPPools() {
             </div>
 
             <div className="p-6 space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-blue-900">Current Usage</p>
-                <p className="text-xs text-blue-700 mt-1">
+              <div 
+                className="border rounded-lg p-4"
+                style={{ 
+                  backgroundColor: getBgColor('50'),
+                  borderColor: getBgColor('200')
+                }}
+              >
+                <p className="text-sm font-medium" style={{ color: getBgColor('900') }}>Current Usage</p>
+                <p className="text-xs mt-1" style={{ color: getBgColor('700') }}>
                   {selectedPool.shares_used.toLocaleString()} shares currently used by incentive plans
                 </p>
               </div>
@@ -1641,7 +1688,17 @@ export default function LTIPPools() {
               </button>
               <button
                 onClick={handleUpdatePool}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Update Pool
               </button>
@@ -1762,9 +1819,10 @@ export default function LTIPPools() {
                 <label className="text-sm font-medium text-gray-500 mb-2 block">Pool Utilization</label>
                 <div className="bg-gray-200 rounded-full h-4">
                   <div 
-                    className="bg-blue-600 h-4 rounded-full flex items-center justify-center text-white text-xs font-medium" 
+                    className="h-4 rounded-full flex items-center justify-center text-white text-xs font-medium" 
                     style={{ 
-                      width: `${Math.max(10, (selectedPool.shares_used / selectedPool.total_shares_allocated) * 100)}%` 
+                      width: `${Math.max(10, (selectedPool.shares_used / selectedPool.total_shares_allocated) * 100)}%`,
+                      backgroundColor: brandColor
                     }}
                   >
                     {((selectedPool.shares_used / selectedPool.total_shares_allocated) * 100).toFixed(1)}%

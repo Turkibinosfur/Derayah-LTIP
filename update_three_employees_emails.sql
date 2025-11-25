@@ -3,7 +3,7 @@
 
 -- Update all three main employees with realistic Gmail addresses
 UPDATE employees
-SET email = 'wajehah.sa@gmail.com',
+SET email = 'employee@example.com',
     portal_access_enabled = true,
     portal_username = 'wajehah.sa',
     portal_password = 'Wajehah123!'

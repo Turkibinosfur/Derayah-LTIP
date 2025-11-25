@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/dateUtils';
 import { FileText, Plus, Calendar, TrendingUp, Users, Award, MoreVertical, Edit, Trash2, PieChart, ChevronDown, ChevronUp } from 'lucide-react';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface IncentivePlan {
   id: string;
@@ -58,6 +59,7 @@ export default function Plans() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const navigate = useNavigate();
+  const { brandColor, getBgColor } = useCompanyColor();
   const [plans, setPlans] = useState<IncentivePlan[]>([]);
   const [vestingTemplates, setVestingTemplates] = useState<VestingScheduleTemplate[]>([]);
   const [ltipPools, setLtipPools] = useState<LTIPPool[]>([]);
@@ -636,12 +638,15 @@ export default function Plans() {
   }
 
   return (
-    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
-      <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <div>
-          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="flex items-center justify-between">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
             {t('plans.title')}
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
+            <span 
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white text-lg font-semibold"
+              style={{ backgroundColor: brandColor }}
+            >
               {plans.length}
             </span>
           </h1>
@@ -649,7 +654,17 @@ export default function Plans() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${isRTL ? 'space-x-reverse' : ''}`}
+          className={`flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition ${isRTL ? 'space-x-reverse' : ''}`}
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
         >
           <Plus className="w-4 h-4" />
           <span className="font-medium">{t('plans.createNewPlan')}</span>
@@ -661,7 +676,7 @@ export default function Plans() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <FileText className="w-6 h-6 text-blue-600" />
+                <FileText className="w-6 h-6" style={{ color: brandColor }} />
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
                 <TrendingUp className="w-6 h-6 text-green-600" />
@@ -1310,7 +1325,17 @@ export default function Plans() {
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center space-x-2 px-6 py-3 text-white rounded-lg transition"
+              style={{ backgroundColor: brandColor }}
+              onMouseEnter={(e) => {
+                const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = brandColor;
+              }}
             >
               <Plus className="w-5 h-5" />
               <span className="font-medium">Create First Plan</span>
@@ -1797,7 +1822,17 @@ export default function Plans() {
               </button>
               <button
                 onClick={handleCreatePlan}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 {t('plans.createPlan')}
               </button>
@@ -2075,7 +2110,17 @@ export default function Plans() {
               </button>
               <button
                 onClick={handleUpdatePlan}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Update Plan
               </button>

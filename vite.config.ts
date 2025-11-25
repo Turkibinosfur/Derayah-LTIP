@@ -61,8 +61,9 @@ const create404Plugin = () => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: '/Derayah-LTIP/',
+export default defineConfig(({ mode }) => ({
+  // Only use base path in production (for GitHub Pages)
+  base: mode === 'production' ? '/Derayah-LTIP/' : '/',
   plugins: [react(), create404Plugin()],
   build: {
     rollupOptions: {
@@ -80,4 +81,4 @@ export default defineConfig({
     exclude: ['lucide-react'],
     include: ['react', 'react-dom', 'react-router-dom'],
   },
-});
+}));

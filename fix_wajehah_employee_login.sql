@@ -1,17 +1,17 @@
--- Fix wajehah.sa@gmail.com Employee Login
+-- Fix employee@example.com Employee Login
 -- This script ensures the employee record exists and is properly configured
 
 -- 1. Check current state
 SELECT 
   '=== CURRENT STATE ===' as step,
-  'wajehah.sa@gmail.com' as email,
+  'employee@example.com' as email,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') 
     THEN 'Auth user exists' 
     ELSE 'Auth user missing' 
   END as auth_status,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com') 
     THEN 'Employee record exists' 
     ELSE 'Employee record missing' 
   END as employee_status;
@@ -37,12 +37,12 @@ BEGIN
   -- Check if auth user exists
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_auth_user_id IS NULL THEN
-    RAISE NOTICE 'Auth user does not exist for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user does not exist for employee@example.com';
     RAISE NOTICE 'Please create the auth user manually in Supabase Dashboard';
-    RAISE NOTICE 'Email: wajehah.sa@gmail.com';
+    RAISE NOTICE 'Email: employee@example.com';
     RAISE NOTICE 'Password: Employee123!';
   ELSE
     RAISE NOTICE 'Auth user exists with ID: %', v_auth_user_id;
@@ -51,7 +51,7 @@ BEGIN
   -- Check if employee record exists
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     RAISE NOTICE 'Employee record does not exist, creating...';
@@ -74,7 +74,7 @@ BEGIN
       v_company_id,
       'Fatima',
       'Al-Zahrani',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       v_auth_user_id,
       true,
       'wajehah.sa',
@@ -122,4 +122,4 @@ SELECT
   u.email_confirmed_at
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';

@@ -4,14 +4,14 @@
 -- 1. Check current state
 SELECT 
   '=== CURRENT STATE CHECK ===' as step,
-  'wajehah.sa@gmail.com' as email,
+  'employee@example.com' as email,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') 
     THEN 'Auth user exists' 
     ELSE 'Auth user missing' 
   END as auth_status,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com') 
     THEN 'Employee record exists' 
     ELSE 'Employee record missing' 
   END as employee_status;
@@ -51,7 +51,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- 5. Check if there are any permission issues
@@ -63,7 +63,7 @@ SELECT
   u.created_at,
   u.last_sign_in_at
 FROM auth.users u
-WHERE u.email = 'wajehah.sa@gmail.com';
+WHERE u.email = 'employee@example.com';
 
 -- 6. Create a simple test function to check if the query works
 CREATE OR REPLACE FUNCTION test_employee_login_query(p_email text)
@@ -98,7 +98,7 @@ $$;
 SELECT 
   '=== FUNCTION TEST ===' as step,
   *
-FROM test_employee_login_query('wajehah.sa@gmail.com');
+FROM test_employee_login_query('employee@example.com');
 
 -- 8. Check if there are any missing indexes
 SELECT 
@@ -127,4 +127,4 @@ SELECT
   u.email_confirmed_at
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';

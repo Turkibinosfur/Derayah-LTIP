@@ -9,7 +9,7 @@ SELECT
   email_confirmed_at,
   created_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 2. Check if employee record exists
 SELECT 
@@ -22,7 +22,7 @@ SELECT
   portal_access_enabled,
   company_id
 FROM employees 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 3. Test the exact query used by EmployeeLogin.tsx
 SELECT 
@@ -35,7 +35,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- 4. Check if there are any RLS issues
@@ -79,7 +79,7 @@ BEGIN
   -- Get auth user ID
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com'
+  WHERE email = 'employee@example.com'
   LIMIT 1;
   
   IF v_company_id IS NULL OR v_auth_user_id IS NULL THEN
@@ -134,4 +134,4 @@ SELECT
   u.email_confirmed_at
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';

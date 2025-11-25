@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/dateUtils';
 import { Users, Plus, Upload, Search, Filter, MoreVertical, Edit, Trash2, Eye, Send, RefreshCw } from 'lucide-react';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface Employee {
   id: string;
@@ -29,6 +30,7 @@ interface Employee {
 export default function Employees() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { brandColor, getBgColor } = useCompanyColor();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -740,9 +742,9 @@ export default function Employees() {
   }
 
   return (
-    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
-      <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <div>
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="flex items-center justify-between">
+        <div className={isRTL ? 'text-right' : ''}>
           <h1 className="text-3xl font-bold text-gray-900">{t('employees.title')}</h1>
           <p className="text-gray-600 mt-1">{t('employees.description')}</p>
         </div>
@@ -753,7 +755,17 @@ export default function Employees() {
           </button>
           <button 
             onClick={handleAddEmployee}
-            className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${isRTL ? 'space-x-reverse' : ''}`}
+            className={`flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition ${isRTL ? 'space-x-reverse' : ''}`}
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
           >
             <Plus className="w-4 h-4" />
             <span className="font-medium">{t('employees.addEmployee')}</span>
@@ -891,7 +903,8 @@ export default function Employees() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            className="h-2 rounded-full transition-all"
+                            style={{ backgroundColor: brandColor }}
                             style={{ width: `${employee.vesting_progress || 0}%` }}
                           ></div>
                         </div>
@@ -995,7 +1008,7 @@ export default function Employees() {
                 <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
                   Previous
                 </button>
-                <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded">1</button>
+                <button className="px-3 py-1 text-sm text-white rounded" style={{ backgroundColor: brandColor }}>1</button>
                 <button className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded transition">
                   2
                 </button>
@@ -1259,7 +1272,17 @@ export default function Employees() {
                                   );
                                   setEditForm({ ...editForm, portal_password: generatedPassword });
                                 }}
-                                className="mt-2 w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                                className="mt-2 w-full px-3 py-2 text-white rounded-lg transition flex items-center justify-center gap-2"
+                                style={{ backgroundColor: brandColor }}
+                                onMouseEnter={(e) => {
+                                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = brandColor;
+                                }}
                                 title="Generate password based on employee name"
                               >
                                 <RefreshCw className="w-4 h-4" />
@@ -1330,7 +1353,17 @@ export default function Employees() {
                                 await loadEmployeeFinancials(updatedEmployee.id);
                               }
                             }}
-                            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            className="px-4 py-2 text-sm text-white rounded-lg transition"
+                            style={{ backgroundColor: brandColor }}
+                            onMouseEnter={(e) => {
+                              const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                              const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                              const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                              e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = brandColor;
+                            }}
                           >
                             Save Changes
                           </button>
@@ -1476,7 +1509,17 @@ export default function Employees() {
                           {!editingFinancialInfo ? (
                             <button
                               onClick={() => setEditingFinancialInfo(true)}
-                              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                              className="px-4 py-2 text-sm text-white rounded-lg transition"
+                            style={{ backgroundColor: brandColor }}
+                            onMouseEnter={(e) => {
+                              const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                              const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                              const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                              e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = brandColor;
+                            }}
                             >
                               {employeeFinancialInfo ? 'Edit' : 'Add Financial Info'}
                             </button>
@@ -2161,7 +2204,17 @@ export default function Employees() {
                   setEmployeeGrants([]);
                   setEmployeeShares(null);
                 }}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Close
               </button>
@@ -2394,7 +2447,17 @@ export default function Employees() {
               </button>
               <button
                 onClick={handleUpdateEmployee}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Save Changes
               </button>
@@ -2646,7 +2709,17 @@ export default function Employees() {
               </button>
               <button
                 onClick={handleCreateEmployee}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 text-white rounded-lg transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                  const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                  const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                  e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
                 Create Employee
               </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/dateUtils';
 import { FileText, Plus, Download, Eye, Trash2, Edit, File, CheckCircle, Clock, Send, MoreHorizontal, Mail } from 'lucide-react';
@@ -39,6 +40,8 @@ interface ESignature {
 }
 
 export default function Documents() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [activeTab, setActiveTab] = useState<'templates' | 'documents' | 'signatures'>('documents');
   const [templates, setTemplates] = useState<DocumentTemplate[]>([]);
   const [documents, setDocuments] = useState<GeneratedDocument[]>([]);
@@ -448,11 +451,11 @@ export default function Documents() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            Document Management
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-2xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {t('documents.title')}
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
               {documents.length}
             </span>
@@ -461,14 +464,14 @@ export default function Documents() {
             Manage templates, generate documents, and track e-signatures
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse flex-row-reverse' : ''}`}>
           {activeTab === 'templates' && (
             <button
               onClick={() => setShowTemplateModal(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition ${isRTL ? 'space-x-reverse' : ''}`}
             >
               <Plus className="w-4 h-4" />
-              <span>New Template</span>
+              <span>{t('documents.newTemplate')}</span>
             </button>
           )}
           {activeTab === 'documents' && (
@@ -477,7 +480,7 @@ export default function Documents() {
               className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
               <FileText className="w-4 h-4" />
-              <span>Generate Document</span>
+              <span>{t('documents.generateDocument')}</span>
             </button>
           )}
         </div>
@@ -527,7 +530,7 @@ export default function Documents() {
                 {template.is_active && (
                   <span className="flex items-center space-x-1 text-green-600">
                     <CheckCircle className="w-4 h-4" />
-                    <span>Active</span>
+                    <span>{t('documents.active')}</span>
                   </span>
                 )}
               </div>
@@ -536,14 +539,14 @@ export default function Documents() {
           {templates.length === 0 && (
             <div className="col-span-3 bg-gray-50 rounded-lg border border-gray-200 p-12 text-center">
               <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No templates yet</h3>
-              <p className="text-gray-600 mb-6">Create your first document template</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('documents.noTemplatesYet')}</h3>
+              <p className="text-gray-600 mb-6">{t('documents.createFirstTemplate')}</p>
               <button
                 onClick={() => setShowTemplateModal(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />
-                <span>Create Template</span>
+                <span>{t('documents.createTemplate')}</span>
               </button>
             </div>
           )}
@@ -555,12 +558,12 @@ export default function Documents() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('documents.document')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('documents.employee')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('documents.type')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('documents.status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('documents.generatedAt')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('documents.actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -693,7 +696,7 @@ export default function Documents() {
           {documents.length === 0 && (
             <div className="p-12 text-center">
               <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No documents generated yet</p>
+              <p className="text-gray-600">{t('documents.noDocumentsGeneratedYet')}</p>
             </div>
           )}
         </div>
@@ -722,7 +725,7 @@ export default function Documents() {
           {signatures.length === 0 && (
             <div className="bg-gray-50 rounded-lg border border-gray-200 p-12 text-center">
               <Send className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No signature requests yet</p>
+              <p className="text-gray-600">{t('documents.noSignatureRequestsYet')}</p>
             </div>
           )}
         </div>
@@ -732,11 +735,11 @@ export default function Documents() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Create Document Template</h2>
+              <h2 className="text-xl font-bold text-gray-900">{t('documents.createDocumentTemplate')}</h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Template Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('documents.templateName')}</label>
                 <input
                   type="text"
                   value={newTemplate.template_name}
@@ -746,7 +749,7 @@ export default function Documents() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Template Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('documents.templateType')}</label>
                 <select
                   value={newTemplate.document_type}
                   onChange={(e) => setNewTemplate({ ...newTemplate, document_type: e.target.value as any })}

@@ -38,6 +38,13 @@ const OperatorBuybackRequests = lazy(() => import('./pages/OperatorBuybackReques
 const OperatorPortfolios = lazy(() => import('./pages/OperatorPortfolios'));
 const Translations = lazy(() => import('./pages/Translations'));
 const CustomerJourney = lazy(() => import('./pages/CustomerJourney'));
+const LandingOptionOne = lazy(() => import('./pages/LandingOptionOne'));
+const LandingOptionTwo = lazy(() => import('./pages/LandingOptionTwo'));
+const LandingOptionThree = lazy(() => import('./pages/LandingOptionThree'));
+const LandingOptionFour = lazy(() => import('./pages/LandingOptionFour'));
+const LandingOptionFive = lazy(() => import('./pages/LandingOptionFive'));
+const LandingOptionFiveAR = lazy(() => import('./pages/LandingOptionFiveAR'));
+const LandingOptionSix = lazy(() => import('./pages/LandingOptionSix'));
 
 // Loading component
 const PageLoader = () => (
@@ -401,6 +408,13 @@ function AppContent() {
               </EmployeeProtectedRoute>
             }
           />
+          <Route path="/concept1" element={<LandingOptionOne />} />
+          <Route path="/concept2" element={<LandingOptionTwo />} />
+          <Route path="/concept3" element={<LandingOptionThree />} />
+          <Route path="/concept4" element={<LandingOptionFour />} />
+          <Route path="/concept5" element={<LandingOptionFive />} />
+          <Route path="/concept5-ar" element={<LandingOptionFiveAR />} />
+          <Route path="/concept6" element={<LandingOptionSix />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>
@@ -408,8 +422,11 @@ function AppContent() {
 }
 
 function App() {
+  // Use base path only in production (for GitHub Pages), not in development
+  const basename = import.meta.env.PROD ? '/Derayah-LTIP' : '';
+  
   return (
-    <BrowserRouter basename="/Derayah-LTIP">
+    <BrowserRouter basename={basename}>
       <AuthProvider>
         <AppContent />
       </AuthProvider>

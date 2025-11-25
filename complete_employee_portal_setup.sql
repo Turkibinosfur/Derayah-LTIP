@@ -1,22 +1,22 @@
--- Complete Employee Portal Setup for wajehah.sa@gmail.com
+-- Complete Employee Portal Setup for employee@example.com
 -- This script ensures everything is properly configured for the employee portal
 
 -- 1. Check current state
 SELECT 
   '=== CURRENT STATE CHECK ===' as step,
-  'wajehah.sa@gmail.com' as email,
+  'employee@example.com' as email,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') 
     THEN 'Auth user exists' 
     ELSE 'Auth user missing' 
   END as auth_status,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com') 
     THEN 'Employee record exists' 
     ELSE 'Employee record missing' 
   END as employee_status,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM grants g JOIN employees e ON g.employee_id = e.id WHERE e.email = 'wajehah.sa@gmail.com' AND g.status = 'pending_signature') 
+    WHEN EXISTS (SELECT 1 FROM grants g JOIN employees e ON g.employee_id = e.id WHERE e.email = 'employee@example.com' AND g.status = 'pending_signature') 
     THEN 'Pending grant exists' 
     ELSE 'No pending grant' 
   END as grant_status;
@@ -71,12 +71,12 @@ BEGIN
   -- Check if auth user exists
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_auth_user_id IS NULL THEN
-    RAISE NOTICE 'Auth user does not exist for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user does not exist for employee@example.com';
     RAISE NOTICE 'Please create the auth user manually in Supabase Dashboard:';
-    RAISE NOTICE 'Email: wajehah.sa@gmail.com';
+    RAISE NOTICE 'Email: employee@example.com';
     RAISE NOTICE 'Password: Employee123!';
     RAISE NOTICE 'Then run this script again.';
     RETURN;
@@ -87,7 +87,7 @@ BEGIN
   -- Get or create employee record
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     -- Create employee record
@@ -108,7 +108,7 @@ BEGIN
       v_company_id,
       'Fatima',
       'Al-Zahrani',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       v_auth_user_id,
       true,
       'wajehah.sa',
@@ -245,7 +245,7 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 4. Check grants that should appear in dashboard
 SELECT 
@@ -261,7 +261,7 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 LEFT JOIN incentive_plans ip ON g.plan_id = ip.id
-WHERE e.email = 'wajehah.sa@gmail.com'
+WHERE e.email = 'employee@example.com'
   AND g.status IN ('active', 'pending_signature')
 ORDER BY g.created_at DESC;
 
@@ -277,6 +277,6 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 )
 AND g.status IN ('active', 'pending_signature');

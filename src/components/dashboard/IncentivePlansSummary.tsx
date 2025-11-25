@@ -273,6 +273,7 @@ interface PieSummaryCardProps {
 }
 
 function PieSummaryCard(props: PieSummaryCardProps) {
+  const { t } = useTranslation();
   const {
     title,
     iconColor,

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 import {
   Building2,
   LayoutDashboard,
@@ -27,6 +28,7 @@ import {
   Languages,
   CreditCard,
   Briefcase,
+  Map,
 } from 'lucide-react';
 
 type PermissionKey =
@@ -76,15 +78,38 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const isRTL = i18n.language === 'ar';
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Initialize sidebar as closed on mobile, open on desktop
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      // Use matchMedia for more reliable detection (matches Tailwind's lg breakpoint)
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+      return isDesktop;
+    }
+    return false;
+  });
   const [dueEventsCount, setDueEventsCount] = useState<number>(0);
   const [draftContractsCount, setDraftContractsCount] = useState<number>(0);
   const [permissions, setPermissions] = useState<Record<PermissionKey, boolean> | null>(null);
   const [loadingPermissions, setLoadingPermissions] = useState(true);
   const [companyOptions, setCompanyOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const { brandColor, getBgColor, getColorWithOpacity } = useCompanyColor();
 
-  const isSuperAdminUser = useMemo(() => isSuperAdmin(), [userRole?.user_type, activeCompanyId]);
+  const isSuperAdminUser = useMemo(() => {
+    // Explicitly check: only show operator navigation if user_type is 'super_admin'
+    // AND they don't have a company_id (super admins are platform-level, not company-specific)
+    // CRITICAL: If user has ANY company_id, they are NOT a platform super admin
+    if (!userRole) return false;
+    
+    // Safety check: if user has a company_id, they are a company-level user, not platform super admin
+    if (userRole.company_id !== null && userRole.company_id !== undefined) {
+      console.log('⚠️ User has company_id, treating as company-level user, not platform super admin');
+      return false;
+    }
+    
+    // Only show operator console for true platform super admins (no company association)
+    return userRole.user_type === 'super_admin' && userRole.company_id === null;
+  }, [userRole?.user_type, userRole?.company_id, activeCompanyId]);
   const onboardingStatus = useMemo(() => {
     if (!onboardingProgress) {
       return { completed: 0, total: 5 };
@@ -103,6 +128,52 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [onboardingProgress]);
 
   const onboardingIncomplete = onboardingLoaded && !isOnboardingComplete();
+
+  // Helper function to check if we're on mobile
+  const isMobile = () => {
+    return typeof window !== 'undefined' && window.innerWidth < 1024;
+  };
+
+  // Handle window resize to update sidebar state
+  useEffect(() => {
+    // Immediately check and set state on mount to prevent flash
+    const checkAndSetSidebar = () => {
+      const mediaQuery = window.matchMedia('(min-width: 1024px)');
+      const isDesktop = mediaQuery.matches;
+      
+      // On mobile, always start with sidebar closed
+      if (!isDesktop) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+      
+      return mediaQuery;
+    };
+    
+    const mediaQuery = checkAndSetSidebar();
+    
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setSidebarOpen(e.matches);
+    };
+    
+    // Listen for changes (modern browsers)
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      // Fallback for older browsers
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
+  }, []);
+
+  // Close sidebar on mobile when route changes
+  useEffect(() => {
+    if (isMobile()) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const loadPermissions = async () => {
@@ -328,6 +399,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       { name: t('common.documents'), href: '/dashboard/documents', icon: FileText, permission: 'documents' },
       { name: t('common.capTable'), href: '/dashboard/cap-table', icon: PieChart, permission: 'cap_table' },
       { name: t('common.portfolio'), href: '/dashboard/portfolio', icon: TrendingUp, permission: 'portfolio' },
+      { name: t('common.customerJourney'), href: '/dashboard/customer-journey', icon: Map, permission: null },
       { name: t('common.settings'), href: '/dashboard/settings', icon: Settings, permission: 'settings' },
     ],
     [t]
@@ -429,7 +501,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: brandColor }}>
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -465,14 +537,27 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <Link
                     key={item.name}
                     to={item.href}
+                    onClick={() => {
+                      // Close sidebar on mobile when navigation item is clicked
+                      if (isMobile()) {
+                        setSidebarOpen(false);
+                      }
+                    }}
                     className={`flex items-center justify-between px-4 py-3 rounded-lg transition ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600 font-medium'
+                        ? 'font-medium'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
+                    style={isActive ? { 
+                      backgroundColor: getBgColor('50'),
+                      color: brandColor 
+                    } : {}}
                   >
                     <div className={`flex items-center space-x-3 ${isRTL ? 'space-x-reverse' : ''}`}>
-                      <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <item.icon 
+                        className={`w-5 h-5 ${isActive ? '' : 'text-gray-400'}`}
+                        style={isActive ? { color: brandColor } : {}}
+                      />
                       <span>{item.name}</span>
                     </div>
                     {isVestingEvents && dueEventsCount > 0 && (
@@ -494,7 +579,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg mb-3">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: brandColor }}
+                >
                   <span className="text-white text-sm font-medium">
                     {user?.email?.charAt(0).toUpperCase()}
                   </span>
@@ -564,7 +652,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             const selectedCompany = companyOptions.find((company) => company.id === selectedId);
                             setActiveCompany(selectedId, selectedCompany?.name ?? null);
                           }}
-                          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[220px]"
+                          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 min-w-[220px]"
+                          style={{ 
+                            '--tw-ring-color': brandColor,
+                          } as React.CSSProperties}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = brandColor;
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '';
+                          }}
                           disabled={loadingCompanies}
                         >
                           <option value="">
@@ -598,9 +695,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <LanguageSwitcher />
               <Link
                 to="/employee/login"
-                className={`flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition group ${
+                className={`flex items-center space-x-2 px-4 py-2 hover:opacity-90 rounded-lg transition group ${
                   isRTL ? 'space-x-reverse' : ''
                 }`}
+                style={{ 
+                  backgroundColor: getBgColor('50'),
+                  color: brandColor 
+                }}
                 title="Switch to Employee Portal"
               >
                 <ArrowRightLeft className="w-4 h-4" />
@@ -614,8 +715,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 p-6">
-          {children}
+        <main className="flex-1 p-4 sm:p-6 w-full max-w-full overflow-x-hidden">
+          <div className="w-full max-w-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>

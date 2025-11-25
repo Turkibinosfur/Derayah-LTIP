@@ -12,7 +12,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- 2. Test the grants query (this is what the dashboard does)
@@ -27,7 +27,7 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 )
 AND g.status IN ('active', 'pending_signature');
 
@@ -41,7 +41,7 @@ WHERE c.id = (
   SELECT e.company_id 
   FROM employees e 
   WHERE e.user_id = (
-    SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+    SELECT id FROM auth.users WHERE email = 'employee@example.com'
   )
 );
 
@@ -64,4 +64,4 @@ SELECT
   u.email_confirmed_at,
   u.created_at
 FROM auth.users u
-WHERE u.email = 'wajehah.sa@gmail.com';
+WHERE u.email = 'employee@example.com';

@@ -1,4 +1,4 @@
--- Ensure Employee Record Exists for wajehah.sa@gmail.com
+-- Ensure Employee Record Exists for employee@example.com
 -- This script ensures the employee record exists and is properly configured
 
 -- 1. Check if auth user exists
@@ -10,7 +10,7 @@ SELECT
   created_at,
   last_sign_in_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 2. Check if employee record exists
 SELECT 
@@ -23,7 +23,7 @@ SELECT
   portal_access_enabled,
   company_id
 FROM employees 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 3. Ensure company exists
 DO $$
@@ -83,12 +83,12 @@ BEGIN
   -- Get auth user ID
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_auth_user_id IS NULL THEN
-    RAISE NOTICE 'Auth user does not exist for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user does not exist for employee@example.com';
     RAISE NOTICE 'Please create the auth user manually in Supabase Dashboard:';
-    RAISE NOTICE 'Email: wajehah.sa@gmail.com';
+    RAISE NOTICE 'Email: employee@example.com';
     RAISE NOTICE 'Password: Employee123!';
     RAISE NOTICE 'Then run this script again.';
     RETURN;
@@ -97,7 +97,7 @@ BEGIN
   -- Check if employee record exists
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     -- Create employee record
@@ -118,7 +118,7 @@ BEGIN
       v_company_id,
       'Fatima',
       'Al-Zahrani',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       v_auth_user_id,
       true,
       'wajehah.sa',
@@ -165,7 +165,7 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 6. Test the exact query used by EmployeeLogin.tsx
 SELECT 
@@ -178,5 +178,5 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );

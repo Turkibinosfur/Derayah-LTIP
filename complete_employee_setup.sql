@@ -1,4 +1,4 @@
--- Complete Employee Setup for wajehah.sa@gmail.com
+-- Complete Employee Setup for employee@example.com
 -- This script ensures everything is properly configured for employee login
 
 -- 1. Ensure company exists
@@ -59,12 +59,12 @@ BEGIN
   -- Check if auth user exists
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_auth_user_id IS NULL THEN
-    RAISE NOTICE 'Auth user does not exist for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user does not exist for employee@example.com';
     RAISE NOTICE 'Please create the auth user manually in Supabase Dashboard:';
-    RAISE NOTICE 'Email: wajehah.sa@gmail.com';
+    RAISE NOTICE 'Email: employee@example.com';
     RAISE NOTICE 'Password: Employee123!';
     RAISE NOTICE 'Then run this script again.';
     RETURN;
@@ -75,7 +75,7 @@ BEGIN
   -- Check if employee record exists
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     -- Create employee record
@@ -96,7 +96,7 @@ BEGIN
       v_company_id,
       'Fatima',
       'Al-Zahrani',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       v_auth_user_id,
       true,
       'wajehah.sa',
@@ -178,4 +178,4 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';

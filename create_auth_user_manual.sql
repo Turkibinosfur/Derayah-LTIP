@@ -5,7 +5,7 @@
 SELECT 
   '=== AUTH USER CHECK ===' as step,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') 
     THEN 'Auth user exists' 
     ELSE 'Auth user missing - follow instructions below' 
   END as status;
@@ -13,7 +13,7 @@ SELECT
 -- Step 2: If auth user doesn't exist, show instructions
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') THEN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') THEN
     RAISE NOTICE '=== AUTH USER MISSING ===';
     RAISE NOTICE 'Please create the auth user manually:';
     RAISE NOTICE '';
@@ -21,7 +21,7 @@ BEGIN
     RAISE NOTICE '2. Navigate to Authentication > Users';
     RAISE NOTICE '3. Click "Add user" button';
     RAISE NOTICE '4. Fill in the details:';
-    RAISE NOTICE '   - Email: wajehah.sa@gmail.com';
+    RAISE NOTICE '   - Email: employee@example.com';
     RAISE NOTICE '   - Password: Employee123!';
     RAISE NOTICE '   - Email Confirm: true';
     RAISE NOTICE '5. Click "Create user"';
@@ -29,9 +29,9 @@ BEGIN
     RAISE NOTICE '7. Then run the quick_fix_wajehah_login.sql script';
     RAISE NOTICE '';
     RAISE NOTICE 'ALTERNATIVE: You can also use the Supabase CLI:';
-    RAISE NOTICE 'supabase auth users create wajehah.sa@gmail.com --password Employee123!';
+    RAISE NOTICE 'supabase auth users create employee@example.com --password Employee123!';
   ELSE
-    RAISE NOTICE 'Auth user exists for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user exists for employee@example.com';
     RAISE NOTICE 'You can proceed with the quick_fix_wajehah_login.sql script';
   END IF;
 END;
@@ -56,7 +56,7 @@ SELECT
   'company_id: uuid (Derayah Financial)' as field2,
   'first_name_en: Fatima' as field3,
   'last_name_en: Al-Zahrani' as field4,
-  'email: wajehah.sa@gmail.com' as field5,
+  'email: employee@example.com' as field5,
   'user_id: uuid (from auth.users)' as field6,
   'portal_access_enabled: true' as field7,
   'portal_username: wajehah.sa' as field8,

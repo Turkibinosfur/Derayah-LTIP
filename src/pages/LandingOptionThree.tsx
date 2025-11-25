@@ -140,33 +140,128 @@ export default function LandingOptionThree() {
             </div>
           </div>
 
-          <div className="bg-slate-800/50 border border-white/10 rounded-3xl p-6 md:p-8 space-y-6">
-            <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/60">Live Feature Montage</p>
-              <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold bg-slate-900 rounded-full">
-                <LayoutList className="w-4 h-4 text-cyan-300" />
-                Context-aware UI
-              </span>
-            </div>
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-slate-900/70 border border-white/10 p-5">
-                <p className="text-xs text-white/60 uppercase">Console Snapshot</p>
-                <h3 className="text-lg font-semibold text-white mt-2">Role-based dashboards</h3>
-                <p className="text-sm text-white/70 mt-3">
-                  Each persona signs in to a tailored dashboard with actionable KPIs, approvals, and insights sourced from the same data foundation.
-                </p>
+          {/* Platform Screenshot - Hero Section */}
+          <div className="relative">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-3xl blur-xl" />
+            <div className="relative bg-slate-800/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+              {/* Browser Chrome */}
+              <div className="bg-slate-900/50 border-b border-white/10 px-4 py-3 flex items-center gap-2">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                </div>
+                <div className="flex-1 mx-4 bg-slate-800 rounded-lg px-4 py-1.5 text-xs text-white/60">
+                </div>
+                <span className="text-xs text-cyan-300 font-medium">Live</span>
               </div>
-              <div className="grid sm:grid-cols-3 gap-3">
-                {[
-                  { label: 'SaaS Health', value: '99.98% uptime', accent: 'text-cyan-300' },
-                  { label: 'Plan Performance', value: '68% KPI attainment', accent: 'text-green-300' },
-                  { label: 'Employee Adoption', value: '92% acceptance', accent: 'text-blue-200' }
-                ].map(item => (
-                  <div key={item.label} className="rounded-2xl bg-slate-900/80 border border-white/10 p-4">
-                    <p className="text-xs text-white/60 uppercase">{item.label}</p>
-                    <p className={`text-lg font-semibold mt-2 ${item.accent}`}>{item.value}</p>
+              
+              {/* Dashboard Content */}
+              <div className="p-6 space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Dashboard Overview</h3>
+                    <p className="text-xs text-white/60 mt-1">Last updated 2 minutes ago</p>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                      <Users className="w-4 h-4 text-cyan-300" />
+                    </div>
+                    <span className="text-xs text-white/60">Company Admin</span>
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <p className="text-xs text-white/60 uppercase tracking-wide mb-2">Total Equity</p>
+                    <p className="text-2xl font-bold text-cyan-300">4.2M</p>
+                    <p className="text-xs text-white/50 mt-1">shares granted</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <p className="text-xs text-white/60 uppercase tracking-wide mb-2">Active Plans</p>
+                    <p className="text-2xl font-bold text-green-300">12</p>
+                    <p className="text-xs text-white/50 mt-1">programs running</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <p className="text-xs text-white/60 uppercase tracking-wide mb-2">Vesting Events</p>
+                    <p className="text-2xl font-bold text-blue-300">14</p>
+                    <p className="text-xs text-white/50 mt-1">due this month</p>
+                  </div>
+                </div>
+
+                {/* Chart Area */}
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm font-semibold text-white">Equity Distribution</p>
+                    <span className="text-xs text-white/60">Last 6 months</span>
+                  </div>
+                  <div className="h-32 flex items-end gap-2">
+                    {[65, 72, 58, 80, 75, 68].map((height, idx) => (
+                      <div key={idx} className="flex-1 flex flex-col items-center">
+                        <div
+                          className="w-full bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t"
+                          style={{ height: `${height}%` }}
+                        />
+                        <span className="text-xs text-white/50 mt-2">{['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][idx]}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pie Chart - Plan Distribution */}
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm font-semibold text-white">Plan Distribution</p>
+                    <span className="text-xs text-white/60">By Type</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-24 h-24">
+                      <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="20" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#06b6d4" strokeWidth="20" strokeDasharray={`${2 * Math.PI * 40 * 0.35} ${2 * Math.PI * 40}`} />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#8b5cf6" strokeWidth="20" strokeDasharray={`${2 * Math.PI * 40 * 0.25} ${2 * Math.PI * 40}`} strokeDashoffset={`-${2 * Math.PI * 40 * 0.35}`} />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" strokeWidth="20" strokeDasharray={`${2 * Math.PI * 40 * 0.25} ${2 * Math.PI * 40}`} strokeDashoffset={`-${2 * Math.PI * 40 * 0.6}`} />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" strokeWidth="20" strokeDasharray={`${2 * Math.PI * 40 * 0.15} ${2 * Math.PI * 40}`} strokeDashoffset={`-${2 * Math.PI * 40 * 0.85}`} />
+                      </svg>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      {[
+                        { label: 'RSU', value: '35%', color: 'bg-cyan-500' },
+                        { label: 'SAR', value: '25%', color: 'bg-purple-500' },
+                        { label: 'ESOP', value: '25%', color: 'bg-green-500' },
+                        { label: 'PSU', value: '15%', color: 'bg-orange-500' }
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs">
+                          <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                          <span className="text-white/70">{item.label}</span>
+                          <span className="text-white/50 ml-auto">{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                  <p className="text-sm font-semibold text-white mb-3">Recent Activity</p>
+                  <div className="space-y-2">
+                    {[
+                      { action: 'Grant approved', user: 'Ahmed Al-Mutairi', time: '2h ago', status: 'approved' },
+                      { action: 'Vesting event processed', user: 'Sara Al-Qahtani', time: '5h ago', status: 'completed' },
+                      { action: 'New plan created', user: 'Mohammed Al-Shehri', time: '1d ago', status: 'pending' }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-3 text-xs">
+                        <div className={`w-2 h-2 rounded-full ${item.status === 'approved' ? 'bg-green-400' : item.status === 'completed' ? 'bg-cyan-400' : 'bg-yellow-400'}`} />
+                        <span className="text-white/70">{item.action}</span>
+                        <span className="text-white/50">•</span>
+                        <span className="text-white/50">{item.user}</span>
+                        <span className="text-white/40 ml-auto">{item.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -228,18 +323,104 @@ export default function LandingOptionThree() {
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                {activeSegment.panels.map(panel => (
-                  <div key={panel.heading} className="rounded-2xl bg-slate-900/70 border border-white/10 p-5">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-white">{panel.heading}</p>
-                        <p className="text-xs text-white/60 mt-1">{panel.content}</p>
-                      </div>
-                      {panel.metric && <span className="text-xs font-semibold text-cyan-300">{panel.metric}</span>}
+              {/* Segment-Specific Screenshot */}
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur-lg" />
+                <div className="relative bg-slate-800/90 border border-white/10 rounded-2xl overflow-hidden">
+                  {/* Browser Chrome */}
+                  <div className="bg-slate-900/70 border-b border-white/10 px-3 py-2 flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                      <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
+                      <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                    </div>
+                    <div className="flex-1 mx-2 bg-slate-800 rounded px-2 py-0.5 text-[10px] text-white/60 truncate">
                     </div>
                   </div>
-                ))}
+                  
+                  {/* Segment-Specific Dashboard */}
+                  <div className="p-4 space-y-4">
+                    {segment === 'saas' && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-white">SaaS Operator Console</h4>
+                          <span className="text-[10px] text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">Active</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Tenants</p>
+                            <p className="text-lg font-bold text-cyan-300">28</p>
+                          </div>
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Uptime</p>
+                            <p className="text-lg font-bold text-green-300">99.98%</p>
+                          </div>
+                        </div>
+                        <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                          <p className="text-[10px] text-white/60 mb-1">API Calls (30d)</p>
+                          <p className="text-sm font-semibold text-white">1.4M</p>
+                        </div>
+                      </>
+                    )}
+                    {segment === 'company' && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-white">Company Equity HQ</h4>
+                          <span className="text-[10px] text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">Live</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Active Plans</p>
+                            <p className="text-lg font-bold text-cyan-300">12</p>
+                          </div>
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Performance</p>
+                            <p className="text-lg font-bold text-green-300">68%</p>
+                          </div>
+                        </div>
+                        <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                          <p className="text-[10px] text-white/60 mb-1">Vesting Events</p>
+                          <p className="text-sm font-semibold text-white">14 due this month</p>
+                        </div>
+                      </>
+                    )}
+                    {segment === 'employee' && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-white">My Equity Portal</h4>
+                          <span className="text-[10px] text-cyan-300 bg-cyan-500/20 px-2 py-0.5 rounded">Personal</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Total Equity</p>
+                            <p className="text-lg font-bold text-cyan-300">4,200</p>
+                          </div>
+                          <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                            <p className="text-[10px] text-white/60 mb-1">Vested</p>
+                            <p className="text-lg font-bold text-green-300">68%</p>
+                          </div>
+                        </div>
+                        <div className="bg-slate-900/50 rounded-lg p-2 border border-white/5">
+                          <p className="text-[10px] text-white/60 mb-1">Next Vesting</p>
+                          <p className="text-sm font-semibold text-white">Feb 15, 2026</p>
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Activity List */}
+                    <div className="space-y-1.5 pt-2 border-t border-white/5">
+                      {activeSegment.panels.map((panel, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-[10px]">
+                          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white/80 font-medium truncate">{panel.heading}</p>
+                            <p className="text-white/50 truncate">{panel.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -263,42 +444,121 @@ export default function LandingOptionThree() {
               </div>
             </div>
 
-            <div className="bg-slate-900/70 border border-white/10 rounded-3xl p-6 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-cyan-300">
-                  <BarChart4 className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white/60">Equity Health Monitor</p>
-                  <h3 className="text-lg font-semibold text-white">Cross-tenant analytics</h3>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: 'Grant approvals', value: '96% within SLA' },
-                  { label: 'Performance KPIs', value: '78% certified on time' },
-                  { label: 'Liquidity requests', value: 'SAR 12.4M processed' },
-                  { label: 'Employee training', value: '1,240 modules completed' }
-                ].map(item => (
-                  <div key={item.label} className="rounded-2xl bg-slate-900 border border-white/10 p-4">
-                    <p className="text-xs text-white/60 uppercase">{item.label}</p>
-                    <p className="text-lg font-semibold text-cyan-300 mt-2">{item.value}</p>
+            {/* Detailed Platform Screenshot */}
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-3xl blur-xl" />
+              <div className="relative bg-slate-800/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+                {/* Browser Chrome */}
+                <div className="bg-slate-900/70 border-b border-white/10 px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
                   </div>
-                ))}
-              </div>
-              <div className="rounded-2xl bg-slate-900 border border-white/10 p-5">
-                <p className="text-xs uppercase tracking-[0.2em] text-white/60 mb-2">Approval queue</p>
-                <div className="space-y-3">
-                  {[
-                    { item: 'Series C RSU • Wave 2', status: 'Awaiting CFO e-signature' },
-                    { item: 'Employee liquidity request', status: 'Compliance review in progress' },
-                    { item: 'New entity onboarding', status: 'Legal docs approved • awaiting HR data' }
-                  ].map(row => (
-                    <div key={row.item} className="flex items-center justify-between px-4 py-3 rounded-xl bg-slate-800/80 border border-white/5">
-                      <span className="text-sm font-medium text-white">{row.item}</span>
-                      <span className="text-xs font-semibold text-cyan-300">{row.status}</span>
+                  <div className="flex-1 mx-3 bg-slate-800 rounded-lg px-3 py-1 text-xs text-white/60">
+                  </div>
+                  <span className="text-xs text-cyan-300 font-medium">Live Data</span>
+                </div>
+                
+                {/* Analytics Dashboard */}
+                <div className="p-6 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Equity Health Monitor</h3>
+                      <p className="text-xs text-white/60 mt-1">Cross-tenant analytics dashboard</p>
                     </div>
-                  ))}
+                    <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+                      <BarChart4 className="w-5 h-5 text-cyan-300" />
+                    </div>
+                  </div>
+
+                  {/* Metrics Grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Grant approvals', value: '96%', subtext: 'within SLA', color: 'text-green-300' },
+                      { label: 'Performance KPIs', value: '78%', subtext: 'certified on time', color: 'text-cyan-300' },
+                      { label: 'Liquidity requests', value: 'SAR 12.4M', subtext: 'processed', color: 'text-blue-300' },
+                      { label: 'Employee training', value: '1,240', subtext: 'modules completed', color: 'text-purple-300' }
+                    ].map((item, idx) => (
+                      <div key={idx} className="bg-slate-900/50 rounded-xl p-3 border border-white/5">
+                        <p className="text-[10px] text-white/60 uppercase tracking-wide mb-1">{item.label}</p>
+                        <p className={`text-xl font-bold ${item.color}`}>{item.value}</p>
+                        <p className="text-[10px] text-white/50 mt-0.5">{item.subtext}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Chart Visualization */}
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-semibold text-white">Performance Trends</p>
+                      <span className="text-xs text-white/60">Last 30 days</span>
+                    </div>
+                    <div className="h-24 flex items-end gap-1.5">
+                      {[45, 52, 48, 65, 58, 72, 68, 75, 70, 78].map((height, idx) => (
+                        <div key={idx} className="flex-1 flex flex-col items-center">
+                          <div
+                            className="w-full bg-gradient-to-t from-cyan-500 to-cyan-400 rounded-t"
+                            style={{ height: `${height}%` }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pie Chart - Approval Status */}
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-semibold text-white">Approval Status</p>
+                      <span className="text-xs text-white/60">This Month</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-20 h-20">
+                        <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                          <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="18" />
+                          <circle cx="50" cy="50" r="35" fill="none" stroke="#10b981" strokeWidth="18" strokeDasharray={`${2 * Math.PI * 35 * 0.6} ${2 * Math.PI * 35}`} />
+                          <circle cx="50" cy="50" r="35" fill="none" stroke="#f59e0b" strokeWidth="18" strokeDasharray={`${2 * Math.PI * 35 * 0.25} ${2 * Math.PI * 35}`} strokeDashoffset={`-${2 * Math.PI * 35 * 0.6}`} />
+                          <circle cx="50" cy="50" r="35" fill="none" stroke="#ef4444" strokeWidth="18" strokeDasharray={`${2 * Math.PI * 35 * 0.15} ${2 * Math.PI * 35}`} strokeDashoffset={`-${2 * Math.PI * 35 * 0.85}`} />
+                        </svg>
+                      </div>
+                      <div className="flex-1 space-y-1.5">
+                        {[
+                          { label: 'Approved', value: '60%', color: 'bg-green-500' },
+                          { label: 'Pending', value: '25%', color: 'bg-orange-500' },
+                          { label: 'Rejected', value: '15%', color: 'bg-red-500' }
+                        ].map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-[10px]">
+                            <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                            <span className="text-white/70">{item.label}</span>
+                            <span className="text-white/50 ml-auto">{item.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Approval Queue */}
+                  <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/60 mb-3">Approval Queue</p>
+                    <div className="space-y-2">
+                      {[
+                        { item: 'Series C RSU • Wave 2', status: 'Awaiting CFO e-signature', priority: 'high' },
+                        { item: 'Employee liquidity request', status: 'Compliance review', priority: 'medium' },
+                        { item: 'New entity onboarding', status: 'Legal docs approved', priority: 'low' }
+                      ].map((row, idx) => (
+                        <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-800/80 border border-white/5">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              row.priority === 'high' ? 'bg-red-400' : 
+                              row.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                            }`} />
+                            <span className="text-xs font-medium text-white truncate">{row.item}</span>
+                          </div>
+                          <span className="text-[10px] font-semibold text-cyan-300 ml-2 shrink-0">{row.status}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -356,6 +616,7 @@ export default function LandingOptionThree() {
     </div>
   );
 }
+
 
 
 

@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { getUpcomingVestingEvents, updateVestingEventStatuses, type VestingEventWithDetails } from '../lib/vestingEventsService';
 import { formatDate, formatDaysRemaining, formatVestingEventId } from '../lib/dateUtils';
 import { Users, FileText, Award, TrendingUp, DollarSign, Package, CheckCircle, Clock, XCircle, UserCheck, UserX, Info, X, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 import LTIPPoolsSummary from '../components/dashboard/LTIPPoolsSummary';
 import IncentivePlansSummary from '../components/dashboard/IncentivePlansSummary';
 import VestingEventsSummary from '../components/dashboard/VestingEventsSummary';
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const { getCurrentCompanyId, userRole, isSuperAdmin } = useAuth();
+  const { brandColor, getBgColor } = useCompanyColor();
   const [stats, setStats] = useState<CompanyStats>({
     totalEmployees: 0,
     activePlans: 0,
@@ -71,17 +73,420 @@ export default function Dashboard() {
   const [roadmapData, setRoadmapData] = useState<any[]>([]);
 
   const currentCompanyId = getCurrentCompanyId();
+  const isLoadingRef = useRef(false);
+  const lastLoadedCompanyIdRef = useRef<string | null>(null);
+
+  // Memoize loadDashboardData to prevent unnecessary re-creations
+  const loadDashboardData = useCallback(async () => {
+    // Prevent concurrent loads
+    if (isLoadingRef.current) {
+      console.log('⏸️ Dashboard data already loading, skipping...');
+      return;
+    }
+
+    try {
+      isLoadingRef.current = true;
+      const companyId = getCurrentCompanyId();
+      
+      // Skip if we already loaded data for this company
+      if (companyId === lastLoadedCompanyIdRef.current && companyInfo) {
+        console.log('⏸️ Data already loaded for this company, skipping...');
+        return;
+      }
+      
+      // For super admins, they need to select a company first
+      if (isSuperAdmin() && !companyId) {
+        console.log('Super admin - no company selected');
+        setLoading(false);
+        setCompanyInfo(null);
+        return;
+      }
+
+      if (!companyId) {
+        console.log('No company ID available');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Loading dashboard for company ID:', companyId);
+      lastLoadedCompanyIdRef.current = companyId;
+
+      // Load company info
+      const { data: companyData, error: companyError } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', companyId)
+        .maybeSingle();
+
+      if (companyError) {
+        console.error('Error fetching company:', companyError);
+        setLoading(false);
+        return;
+      }
+
+      if (companyData) {
+        setCompanyInfo({ company_id: companyId, companies: companyData });
+        console.log('Company ID:', companyId);
+
+        // Load vesting events and roadmap in parallel (they set state internally)
+        Promise.all([
+          loadUpcomingVestingEvents(companyId).catch(err => {
+            console.error('Error loading vesting events:', err);
+          }),
+          loadRoadmapData(companyId).catch(err => {
+            console.error('Error loading roadmap:', err);
+          }),
+        ]).catch(() => {
+          // Errors already logged above
+        });
+
+        // Load all stats queries in parallel for better performance
+        const [
+          employeesRes,
+          plansRes,
+          activeGrantsRes,
+          sharesRes,
+          marketDataRes,
+          companyRes,
+          allGrantsRes,
+          acceptedGrantsRes,
+          pendingGrantsRes,
+          rejectedGrantsRes,
+          employeeShareholdersRes,
+          allShareholdersRes,
+          ltipPoolsRes,
+        ] = await Promise.all([
+          supabase
+            .from('employees')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('employment_status', 'active'),
+          supabase
+            .from('incentive_plans')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'active'),
+          supabase
+            .from('grants')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'active'),
+          supabase
+            .from('grants')
+            .select('total_shares')
+            .eq('company_id', companyId)
+            .eq('status', 'active'),
+          supabase
+            .from('market_data')
+            .select('closing_price')
+            .eq('tadawul_symbol', (companyData as any)?.tadawul_symbol || '4084')
+            .order('trading_date', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from('companies')
+            .select('available_shares, tadawul_symbol, current_fmv, fmv_source')
+            .eq('id', companyId)
+            .maybeSingle(),
+          supabase
+            .from('grants')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId),
+          supabase
+            .from('grants')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'active'),
+          supabase
+            .from('grants')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'pending_signature'),
+          supabase
+            .from('grants')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'cancelled'),
+          supabase
+            .from('shareholders')
+            .select('shares_owned')
+            .eq('company_id', companyId)
+            .eq('shareholder_type', 'employee')
+            .eq('is_active', true),
+          supabase
+            .from('shareholders')
+            .select('shares_owned')
+            .eq('company_id', companyId)
+            .eq('is_active', true),
+          supabase
+            .from('ltip_pools')
+            .select('total_shares_allocated, shares_used, shares_available')
+            .eq('company_id', companyId),
+        ]);
+
+        // Process results only if queries succeeded
+        if (!employeesRes || !plansRes || !activeGrantsRes) {
+          console.error('Critical queries failed');
+          setLoading(false);
+          return;
+        }
+
+        const totalShares = sharesRes.data?.reduce(
+          (sum, grant) => sum + Number(grant.total_shares || 0),
+          0
+        ) || 0;
+
+        // Load additional data in parallel
+        const [
+          activeEmployeeIdsRes,
+          inactiveEmployeeIdsRes,
+          esopPlansRes,
+        ] = await Promise.all([
+          supabase
+            .from('grants')
+            .select('employee_id')
+            .eq('company_id', companyId)
+            .eq('status', 'active'),
+          supabase
+            .from('grants')
+            .select('employee_id, employees!inner(employment_status)')
+            .eq('company_id', companyId)
+            .neq('employees.employment_status', 'active'),
+          supabase
+            .from('incentive_plans')
+            .select('id, total_shares_allocated, shares_granted, shares_available')
+            .eq('company_id', companyId)
+            .eq('plan_type', 'ESOP')
+            .eq('status', 'active'),
+        ]);
+
+        const uniqueActiveESOPEmployees = new Set(
+          activeEmployeeIdsRes.data?.map(g => g.employee_id) || []
+        ).size;
+
+        const uniqueInactiveESOPEmployees = new Set(
+          inactiveEmployeeIdsRes.data?.map(g => g.employee_id) || []
+        ).size;
+
+        const esopPlanIds = esopPlansRes.data?.map(plan => plan.id) || [];
+
+        const esopGrantsRes = esopPlanIds.length > 0 ? await supabase
+          .from('grants')
+          .select('total_shares')
+          .eq('company_id', companyId)
+          .eq('status', 'active')
+          .in('plan_id', esopPlanIds) : { data: [] };
+
+        const esopTotalShares = esopGrantsRes.data?.reduce(
+          (sum, grant) => sum + Number(grant.total_shares || 0),
+          0
+        ) || 0;
+
+        const esopTotalAllocated = esopPlansRes.data?.reduce(
+          (sum, plan) => sum + Number(plan.total_shares_allocated || 0),
+          0
+        ) || 0;
+
+        // Get LTIP plans data
+        const { data: ltipPlansData } = await supabase
+          .from('incentive_plans')
+          .select('shares_granted, plan_type')
+          .eq('company_id', companyId)
+          .like('plan_type', 'LTIP%');
+        
+        const grantedFromPlans = (ltipPlansData || []).reduce(
+          (sum, plan) => sum + Number(plan.shares_granted || 0),
+          0
+        );
+
+        // Use grantedFromPlans as the source of truth (maintained by DB triggers)
+        // Fallback to grantedSharesFromGrants if plans data is not available
+        const grantedShares = grantedFromPlans > 0 ? grantedFromPlans : 0;
+
+        console.log('📊 Shares Breakdown Debug:', {
+          totalGrants: allGrantsRes.data?.length || 0,
+          ltipTotalAllocated,
+          grantedShares,
+        });
+
+        const ltipTotalAllocated = ltipPoolsRes.data?.reduce(
+          (sum, pool) => sum + Number(pool.total_shares_allocated || 0),
+          0
+        ) || 0;
+
+        const ltipTotalShares = ltipPoolsRes.data?.reduce(
+          (sum, pool) => sum + Number(pool.shares_used || 0),
+          0
+        ) || 0;
+
+        const ungrantedShares = Math.max(0, ltipTotalAllocated - grantedShares);
+
+        // Calculate vested and unvested from active LTIP grants only
+        const { data: allGrantsData } = await supabase
+          .from('grants')
+          .select('id, total_shares, vested_shares, remaining_unvested_shares, status, plan_id, incentive_plans!inner(plan_type)')
+          .eq('company_id', companyId)
+          .eq('status', 'active')
+          .like('incentive_plans.plan_type', 'LTIP%');
+
+        const validLtipGrants = (allGrantsData || []).filter(g => g.incentive_plans);
+
+        // Calculate total shares from active grants
+        const activeGrantedTotal = validLtipGrants.reduce(
+          (sum, grant) => sum + Number(grant.total_shares || 0),
+          0
+        );
+
+        // If vested_shares is null/0, calculate from vesting events
+        let vestedShares = 0;
+        let unvestedShares = 0;
+        
+        if (validLtipGrants.length > 0) {
+          // Try to use grant fields first
+          vestedShares = validLtipGrants.reduce(
+            (sum, grant) => {
+              const vested = Number(grant.vested_shares || 0);
+              return sum + vested;
+            },
+            0
+          );
+          
+          // Calculate unvested as: (active granted total) - vested
+          // This is more accurate than summing remaining_unvested_shares
+          unvestedShares = Math.max(0, activeGrantedTotal - vestedShares);
+          
+          // If vested shares are 0, try calculating from vesting events
+          if (vestedShares === 0 && activeGrantedTotal > 0) {
+            const grantIds = validLtipGrants.map(g => g.id);
+            const { data: vestingEventsData } = await supabase
+              .from('vesting_events')
+              .select('grant_id, shares_to_vest, status')
+              .in('grant_id', grantIds);
+            
+            if (vestingEventsData) {
+              const vestedFromEvents = vestingEventsData
+                .filter(e => e.status === 'vested' || e.status === 'transferred' || e.status === 'exercised')
+                .reduce((sum, e) => sum + Number(e.shares_to_vest || 0), 0);
+              
+              vestedShares = vestedFromEvents;
+              unvestedShares = Math.max(0, activeGrantedTotal - vestedFromEvents);
+              
+              console.log('📊 Calculated from vesting events:', {
+                vestedFromEvents,
+                activeGrantedTotal,
+                unvestedShares
+              });
+            }
+          }
+        }
+
+        console.log('📊 Calculated Breakdown:', {
+          granted: grantedShares,
+          ungranted: ungrantedShares,
+          vested: vestedShares,
+          unvested: unvestedShares,
+        });
+
+        setSharesBreakdown({
+          granted: grantedShares,
+          ungranted: ungrantedShares,
+          vested: vestedShares,
+          unvested: unvestedShares,
+        });
+
+        // Calculate equity pool size from employee shareholders
+        const employeeSharesTotal = employeeShareholdersRes.data?.reduce(
+          (sum, shareholder) => sum + Number(shareholder.shares_owned),
+          0
+        ) || 0;
+
+        // Calculate total shares from all shareholders
+        const totalSharesFromShareholders = allShareholdersRes.data?.reduce(
+          (sum, shareholder) => sum + Number(shareholder.shares_owned),
+          0
+        ) || 0;
+
+        // Calculate option pool balance (total - employee shares)
+        const optionPoolBalance = totalSharesFromShareholders - employeeSharesTotal;
+
+        const closingPriceRaw = marketDataRes?.data?.closing_price;
+        const parsedClosingPrice =
+          closingPriceRaw !== null && closingPriceRaw !== undefined
+            ? Number(closingPriceRaw)
+            : null;
+
+        const manualFmvRaw = companyRes.data?.current_fmv;
+        const parsedManualFmv =
+          manualFmvRaw !== null && manualFmvRaw !== undefined
+            ? Number(manualFmvRaw)
+            : null;
+
+        const resolvedCurrentFmv =
+          parsedClosingPrice !== null && !Number.isNaN(parsedClosingPrice)
+            ? parsedClosingPrice
+            : parsedManualFmv !== null && !Number.isNaN(parsedManualFmv)
+            ? parsedManualFmv
+            : 30; // Default fallback
+
+        console.log('Employee shares total:', employeeSharesTotal);
+        console.log('Total shares from shareholders:', totalSharesFromShareholders);
+        console.log('Option pool balance:', optionPoolBalance);
+        console.log('Query results:', {
+          employees: employeesRes.count,
+          plans: plansRes.count,
+          grants: allGrantsRes.count,
+        });
+        console.log('Full responses with errors:', {
+          employeesRes,
+          plansRes,
+          activeGrantsRes,
+        });
+
+        setStats({
+          totalEmployees: employeesRes.count || 0,
+          activePlans: plansRes.count || 0,
+          activeGrants: activeGrantsRes.count || 0,
+          totalShares: totalShares,
+          currentFMV: resolvedCurrentFmv,
+          optionPoolBalance: optionPoolBalance,
+          totalGrants: allGrantsRes.count || 0,
+          grantsAccepted: acceptedGrantsRes.count || 0,
+          grantsPending: pendingGrantsRes.count || 0,
+          grantsRejected: rejectedGrantsRes.count || 0,
+          activeESOPEmployees: uniqueActiveESOPEmployees,
+          inactiveESOPEmployees: uniqueInactiveESOPEmployees,
+          equityPoolSize: totalSharesFromShareholders,
+          esopTotalAllocated: esopTotalAllocated,
+          esopTotalShares: esopTotalShares,
+          ltipTotalAllocated: ltipTotalAllocated,
+          ltipTotalShares: ltipTotalShares,
+        });
+
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      setLoading(false);
+    } finally {
+      isLoadingRef.current = false;
+    }
+  }, [getCurrentCompanyId, isSuperAdmin, companyInfo]);
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    // Only load if we have a company ID and haven't loaded yet
+    if (currentCompanyId && !lastLoadedCompanyIdRef.current) {
+      loadDashboardData();
+    }
+  }, [currentCompanyId, loadDashboardData]);
 
   // Reload dashboard when active company changes (for super admins)
   useEffect(() => {
-    if (currentCompanyId && companyInfo?.company_id !== currentCompanyId) {
+    if (currentCompanyId && companyInfo?.company_id !== currentCompanyId && lastLoadedCompanyIdRef.current !== currentCompanyId) {
       loadDashboardData();
     }
-  }, [currentCompanyId]);
+  }, [currentCompanyId, companyInfo?.company_id, loadDashboardData]);
   
   // Load calendar events when company info is available (deferred for better initial load)
   useEffect(() => {
@@ -340,13 +745,10 @@ export default function Dashboard() {
     setShowVestingDetailsModal(true);
   };
 
-  const loadDashboardData = async () => {
-    try {
-      const companyId = getCurrentCompanyId();
-      
-      // For super admins, they need to select a company first
-      if (isSuperAdmin() && !companyId) {
-        console.log('Super admin - no company selected');
+  // Memoize stat cards to prevent unnecessary recalculations
+  const statCards = useMemo(() => [
+    {
+      name: 'Active Employees',
         setLoading(false);
         setCompanyInfo(null);
         return;
@@ -792,10 +1194,11 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
-    } finally {
       setLoading(false);
+    } finally {
+      isLoadingRef.current = false;
     }
-  };
+  }, [getCurrentCompanyId, isSuperAdmin, companyInfo]);
 
   // Memoize stat cards to prevent unnecessary recalculations
   const statCards = useMemo(() => [
@@ -962,6 +1365,9 @@ export default function Dashboard() {
 
   // Show message if no company info is available
   if (!companyInfo) {
+    // Check if userRole is missing - this indicates the user account wasn't properly linked
+    const isUserRoleMissing = !userRole || !userRole.company_id;
+    
     return (
       <div className="space-y-6">
         <div>
@@ -974,11 +1380,21 @@ export default function Dashboard() {
           <div className="max-w-md mx-auto">
             <AlertCircle className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              No Company Data Available
+              {isUserRoleMissing ? 'Account Setup Incomplete' : 'No Company Data Available'}
             </h2>
-            <p className="text-gray-600">
-              Unable to load company information. Please contact support if this issue persists.
+            <p className="text-gray-600 mb-4">
+              {isUserRoleMissing 
+                ? 'Your account was created but is not yet linked to a company. This may happen if you just signed up. Please try refreshing the page or contact support if the issue persists.'
+                : 'Unable to load company information. Please contact support if this issue persists.'}
             </p>
+            {isUserRoleMissing && (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Refresh Page
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -986,7 +1402,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`space-y-6 w-full max-w-full overflow-x-hidden ${isRTL ? 'text-right' : 'text-left'}`}>
       <div>
         <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
         <p className="text-gray-600 mt-1">
@@ -995,14 +1411,19 @@ export default function Dashboard() {
       </div>
 
       {companyInfo && (
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-white">
+        <div 
+          className="rounded-xl p-6 text-white"
+          style={{ 
+            background: `linear-gradient(to right, ${brandColor}, ${getBgColor('700')})`
+          }}
+        >
           <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div>
               <h2 className="text-2xl font-bold">{companyInfo.companies?.company_name_en}</h2>
-              <p className="text-blue-100 mt-1">{t('dashboard.tadawul')}: {companyInfo.companies?.tadawul_symbol}</p>
+              <p className="mt-1 opacity-90">{t('dashboard.tadawul')}: {companyInfo.companies?.tadawul_symbol}</p>
             </div>
             <div className={isRTL ? 'text-left' : 'text-right'}>
-              <p className="text-sm text-blue-100">{t('dashboard.verificationStatus')}</p>
+              <p className="text-sm opacity-90">{t('dashboard.verificationStatus')}</p>
               <span className="inline-block mt-1 px-3 py-1 bg-white/20 rounded-full text-sm font-medium">
                 {companyInfo.companies?.verification_status}
               </span>
@@ -1625,16 +2046,16 @@ export default function Dashboard() {
       </div>
 
       {/* Shares Roadmap Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">Shares Roadmap</h3>
-          <p className="text-sm text-gray-500 mt-1">Company-wide vesting schedule overview</p>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">Shares Roadmap</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Company-wide vesting schedule overview</p>
         </div>
-        <div className="p-6">
+        <div className="p-3 sm:p-6 overflow-x-auto">
           {roadmapData && roadmapData.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-4 min-w-[600px] sm:min-w-0">
               {/* Chart Bars */}
-              <div className="flex items-end justify-between gap-2" style={{ height: '256px' }}>
+              <div className="flex items-end justify-between gap-2 sm:gap-3" style={{ height: '200px', minHeight: '200px' }}>
                 {roadmapData.map((item: any, index: number) => {
                   const maxValue = Math.max(
                     ...roadmapData.map((d: any) => 
@@ -1644,7 +2065,7 @@ export default function Dashboard() {
                   );
                   
                   const totalValuation = (item.unvestedValuation || 0) + (item.vestedValuation || 0);
-                  const chartHeight = 256;
+                  const chartHeight = 200;
                   const totalBarHeightPx = maxValue > 0 ? (totalValuation / maxValue) * chartHeight : 0;
                   const vestedBarHeightPx = totalValuation > 0 
                     ? ((item.vestedValuation || 0) / totalValuation) * totalBarHeightPx 
@@ -1657,7 +2078,7 @@ export default function Dashboard() {
                   return (
                     <div key={index} className="flex-1 h-full flex flex-col items-center group cursor-pointer relative">
                       {/* Tooltip */}
-                      <div className="hidden group-hover:block absolute bottom-full mb-2 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg z-10 whitespace-nowrap transform -translate-x-1/2 left-1/2">
+                      <div className="hidden group-hover:block absolute bottom-full mb-2 bg-gray-900 text-white text-xs rounded-lg px-2 sm:px-3 py-2 shadow-lg z-10 whitespace-nowrap transform -translate-x-1/2 left-1/2">
                         <div className="font-semibold mb-1">{item.year}</div>
                         {item.vestedValuation > 0 && (
                           <>
@@ -1681,7 +2102,7 @@ export default function Dashboard() {
                         {/* Share count label above the block */}
                         {(item.unvestedShares > 0 || item.vestedShares > 0) && (
                           <div 
-                            className="absolute text-xs font-semibold text-gray-700 whitespace-nowrap"
+                            className="absolute text-[10px] sm:text-xs font-semibold text-gray-700 whitespace-nowrap"
                             style={{ 
                               bottom: `${totalBarHeightPx + 4}px`,
                               left: '50%',
@@ -1718,27 +2139,27 @@ export default function Dashboard() {
               </div>
               
               {/* X-Axis Labels */}
-              <div className="flex items-center justify-between gap-2 mt-2 border-t border-gray-200 pt-3">
+              <div className="flex items-center justify-between gap-2 sm:gap-3 mt-2 border-t border-gray-200 pt-3">
                 {roadmapData.map((item: any, index: number) => (
                   <div key={index} className="flex-1 text-center">
-                    <div className="text-xs text-gray-600 font-medium">{item.year}</div>
+                    <div className="text-xs sm:text-sm text-gray-600 font-medium">{item.year}</div>
                   </div>
                 ))}
               </div>
               
               {/* Legend */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-center space-x-4 text-xs text-gray-600 mb-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-green-600"></div>
+              <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs text-gray-600 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-green-600 flex-shrink-0"></div>
                     <span>Vested Shares (SAR)</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-purple-600"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-purple-600 flex-shrink-0"></div>
                     <span>Unvested Shares (SAR)</span>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 text-center space-y-1">
+                <div className="text-[10px] sm:text-xs text-gray-500 text-center space-y-1">
                   <p><strong>Vested includes:</strong> vested, transferred, exercised, due, and past-dated events</p>
                   <p><strong>Unvested includes:</strong> pending and future-dated events</p>
                 </div>
@@ -1746,7 +2167,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <TrendingUp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 text-gray-300" />
               <p className="text-sm">No roadmap data available</p>
             </div>
           )}
@@ -1754,15 +2175,17 @@ export default function Dashboard() {
       </div>
 
       {/* Vesting Events Calendar */}
-      <div className="mb-6">
+      <div className="mb-6 w-full max-w-full overflow-hidden">
         <div className="mb-4">
           <h3 className="text-lg font-bold text-gray-900 mb-2">Vesting Events Calendar</h3>
           <p className="text-sm text-gray-600">Visual timeline of upcoming vesting events</p>
         </div>
-        <VestingEventsCalendar 
-          events={calendarVestingEvents}
-          onEventClick={handleViewVestingDetails}
-        />
+        <div className="w-full max-w-full overflow-hidden">
+          <VestingEventsCalendar 
+            events={calendarVestingEvents}
+            onEventClick={handleViewVestingDetails}
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-xl p-6 border border-gray-200">

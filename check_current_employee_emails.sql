@@ -32,12 +32,12 @@ SELECT
     ELSE '✗ wajehah.com@gmail.com NOT FOUND'
   END as wajehah_com_status;
 
--- Check for wajehah.sa@gmail.com
+-- Check for employee@example.com
 SELECT 
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com' AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')) 
-    THEN '✓ wajehah.sa@gmail.com EXISTS'
-    ELSE '✗ wajehah.sa@gmail.com NOT FOUND'
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com' AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')) 
+    THEN '✓ employee@example.com EXISTS'
+    ELSE '✗ employee@example.com NOT FOUND'
   END as wajehah_sa_status;
 
 -- Show all unique emails in the database

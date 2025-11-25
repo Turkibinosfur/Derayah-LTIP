@@ -22,6 +22,7 @@ export interface Database {
           available_shares: number
           current_fmv: number | null
           fmv_source: string | null
+          brand_color: string | null
           admin_user_id: string | null
           status: 'active' | 'suspended' | 'inactive'
           created_at: string
@@ -40,6 +41,7 @@ export interface Database {
           available_shares?: number
           current_fmv?: number | null
           fmv_source?: string | null
+          brand_color?: string | null
           admin_user_id?: string | null
           status?: 'active' | 'suspended' | 'inactive'
           created_at?: string
@@ -58,6 +60,7 @@ export interface Database {
           available_shares?: number
           current_fmv?: number | null
           fmv_source?: string | null
+          brand_color?: string | null
           admin_user_id?: string | null
           status?: 'active' | 'suspended' | 'inactive'
           created_at?: string

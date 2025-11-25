@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { TrendingUp, Plus, Edit, Trash2, DollarSign, Users, Target, MoreVertical } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface LinkedGrant {
   id: string;
@@ -23,6 +25,9 @@ interface PerformanceMetric {
 }
 
 export default function PerformanceMetrics() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const { brandColor } = useCompanyColor();
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [showMetricModal, setShowMetricModal] = useState(false);
@@ -265,12 +270,15 @@ export default function PerformanceMetrics() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            Performance Metrics
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-2xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {t('performanceMetrics.title')}
+            <span 
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white text-lg font-semibold"
+              style={{ backgroundColor: brandColor }}
+            >
               {metrics.length}
             </span>
           </h1>
@@ -280,24 +288,44 @@ export default function PerformanceMetrics() {
         </div>
         <button
           onClick={openCreateModal}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className={`flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition ${isRTL ? 'space-x-reverse' : ''}`}
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
         >
           <Plus className="w-4 h-4" />
-          <span>Add Metric</span>
+          <span>{t('performanceMetrics.addMetric')}</span>
         </button>
       </div>
 
       {metrics.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
           <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No performance metrics yet</h3>
-          <p className="text-gray-600 mb-6">Create metrics to enable performance-based vesting</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('performanceMetrics.noMetricsYet')}</h3>
+          <p className="text-gray-600 mb-6">{t('performanceMetrics.createFirstMetric')}</p>
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="inline-flex items-center space-x-2 px-4 py-2 text-white rounded-lg transition"
+            style={{ backgroundColor: brandColor }}
+            onMouseEnter={(e) => {
+              const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+              const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+              const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+              e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = brandColor;
+            }}
           >
             <Plus className="w-4 h-4" />
-            <span>Add Metric</span>
+            <span>{t('performanceMetrics.addMetric')}</span>
           </button>
         </div>
       ) : (
@@ -306,13 +334,13 @@ export default function PerformanceMetrics() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Metric</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Unit</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Description</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Linked Grants</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Created</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.metric')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.type')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.unit')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.descriptionLabel')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.linkedGrants')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.created')}</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('performanceMetrics.actions')}</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -339,7 +367,7 @@ export default function PerformanceMetrics() {
                       {metric.description ? (
                         <span className="block max-w-md break-words">{metric.description}</span>
                       ) : (
-                        <span className="text-xs text-gray-400">No description</span>
+                        <span className="text-xs text-gray-400">{t('performanceMetrics.noDescription')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -356,7 +384,7 @@ export default function PerformanceMetrics() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400">None</span>
+                        <span className="text-xs text-gray-400">{t('performanceMetrics.none')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -449,7 +477,7 @@ export default function PerformanceMetrics() {
           <div className="bg-white rounded-lg max-w-2xl w-full">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-bold text-gray-900">
-                {modalMode === 'create' ? 'Add Performance Metric' : 'Edit Performance Metric'}
+                {modalMode === 'create' ? t('performanceMetrics.addPerformanceMetric') : t('performanceMetrics.editPerformanceMetric')}
               </h2>
             </div>
 
@@ -476,7 +504,7 @@ export default function PerformanceMetrics() {
                   onChange={(e) => setMetricForm({ ...metricForm, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
-                  placeholder="Brief description of this metric"
+                  placeholder={t('performanceMetrics.descriptionPlaceholder')}
                 />
               </div>
 
@@ -490,9 +518,9 @@ export default function PerformanceMetrics() {
                     onChange={(e) => setMetricForm({ ...metricForm, metric_type: e.target.value as any })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="financial">Financial</option>
-                    <option value="operational">Operational</option>
-                    <option value="personal">Personal</option>
+                    <option value="financial">{t('performanceMetrics.financial')}</option>
+                    <option value="operational">{t('performanceMetrics.operational')}</option>
+                    <option value="personal">{t('performanceMetrics.personal')}</option>
                   </select>
                 </div>
 
@@ -529,9 +557,21 @@ export default function PerformanceMetrics() {
               <button
                 onClick={handleSaveMetric}
                 disabled={!metricForm.name || !metricForm.unit_of_measure}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                    const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                    const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                    e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
               >
-                {modalMode === 'create' ? 'Add Metric' : 'Save Changes'}
+                {modalMode === 'create' ? t('performanceMetrics.addMetric') : t('performanceMetrics.saveChanges')}
               </button>
             </div>
           </div>
@@ -541,7 +581,7 @@ export default function PerformanceMetrics() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Performance Metric</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('performanceMetrics.deletePerformanceMetric')}</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete this metric? This action cannot be undone.
             </p>

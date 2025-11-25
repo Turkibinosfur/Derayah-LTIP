@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { formatDate } from '../lib/dateUtils';
 import {
@@ -49,6 +50,8 @@ interface WaterfallResult {
 }
 
 export default function CapTable() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [shareholders, setShareholders] = useState<Shareholder[]>([]);
   const [fundingRounds, setFundingRounds] = useState<FundingRound[]>([]);
   const [scenarios, setScenarios] = useState<DilutionScenario[]>([]);
@@ -333,7 +336,7 @@ export default function CapTable() {
       }));
 
       results.push({
-        name: 'New Investor',
+        name: t('capTable.newInvestor'),
         current_shares: 0,
         current_ownership: 0,
         new_ownership: calculateOwnership(dilutionModel.new_shares, newTotalShares),
@@ -517,10 +520,10 @@ export default function CapTable() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
             Cap Table Management
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
               {shareholders.length}
@@ -530,7 +533,7 @@ export default function CapTable() {
             Comprehensive equity structure analysis and scenario modeling
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <button
             onClick={() => setShowWaterfallAnalysis(true)}
             className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -569,7 +572,7 @@ export default function CapTable() {
               <Users className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Shareholders</p>
+              <p className="text-sm text-gray-600">{t('capTable.shareholders')}</p>
               <p className="text-2xl font-bold text-gray-900">{shareholders.length}</p>
             </div>
           </div>
@@ -581,7 +584,7 @@ export default function CapTable() {
               <PieChart className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Shares</p>
+              <p className="text-sm text-gray-600">{t('capTable.totalShares')}</p>
               <p className="text-2xl font-bold text-gray-900">{totalShares.toLocaleString()}</p>
             </div>
           </div>
@@ -593,7 +596,7 @@ export default function CapTable() {
               <DollarSign className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Investment</p>
+              <p className="text-sm text-gray-600">{t('capTable.investment')}</p>
               <p className="text-2xl font-bold text-gray-900">SAR {(totalInvestment / 1000000).toFixed(1)}M</p>
             </div>
           </div>
@@ -605,7 +608,7 @@ export default function CapTable() {
               <TrendingUp className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Funding Rounds</p>
+              <p className="text-sm text-gray-600">{t('capTable.fundingRounds')}</p>
               <p className="text-2xl font-bold text-gray-900">{fundingRounds.length}</p>
             </div>
           </div>
@@ -821,7 +824,7 @@ export default function CapTable() {
           {activeView === 'visualization' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Ownership Distribution</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('capTable.ownershipDistribution')}</h3>
                 <div className="relative">
                   <svg viewBox="0 0 200 200" className="w-full max-w-md mx-auto">
                     {shareholders.map((sh, index) => {
@@ -863,7 +866,7 @@ export default function CapTable() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Breakdown by Type</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('capTable.breakdownByType')}</h3>
                 <div className="space-y-4">
                   {['founder', 'investor', 'employee', 'institution'].map(type => {
                     const typeShares = shareholders
@@ -902,7 +905,7 @@ export default function CapTable() {
                   <div className="flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-900">Fully Diluted Shares</h4>
+                      <h4 className="font-medium text-blue-900">{t('capTable.fullyDilutedShares')}</h4>
                       <p className="text-sm text-blue-700 mt-1">
                         Total: {totalShares.toLocaleString()} shares
                       </p>
@@ -921,7 +924,7 @@ export default function CapTable() {
       {scenarios.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Dilution Scenarios</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('capTable.recentDilutionScenarios')}</h2>
             <button
               onClick={() => setShowDilutionModel(true)}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -953,7 +956,7 @@ export default function CapTable() {
       {fundingRounds.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Funding History</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('capTable.fundingHistory')}</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -1003,7 +1006,7 @@ export default function CapTable() {
       {showAddShareholder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Add Shareholder</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('capTable.addShareholder')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>

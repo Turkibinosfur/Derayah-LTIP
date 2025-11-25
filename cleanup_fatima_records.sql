@@ -79,7 +79,7 @@ BEGIN
       v_company_id,
       'EMP-FATIMA-001',
       '1234567892',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       'Fatima',
       'Al-Zahrani',
       'Data Science',
@@ -99,7 +99,7 @@ BEGIN
     
     -- Update her record to ensure correct email and portal access
     UPDATE employees
-    SET email = 'wajehah.sa@gmail.com',
+    SET email = 'employee@example.com',
         portal_access_enabled = true,
         portal_username = 'wajehah.sa',
         portal_password = 'WajehahSa123!'

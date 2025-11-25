@@ -12,14 +12,14 @@ SELECT
 SELECT 
   '=== AUTH USERS TEST ===' as test,
   COUNT(*) as total_users,
-  COUNT(CASE WHEN email = 'wajehah.sa@gmail.com' THEN 1 END) as target_user_exists
+  COUNT(CASE WHEN email = 'employee@example.com' THEN 1 END) as target_user_exists
 FROM auth.users;
 
 -- 3. Test if we can read from employees
 SELECT 
   '=== EMPLOYEES TEST ===' as test,
   COUNT(*) as total_employees,
-  COUNT(CASE WHEN email = 'wajehah.sa@gmail.com' THEN 1 END) as target_employee_exists
+  COUNT(CASE WHEN email = 'employee@example.com' THEN 1 END) as target_employee_exists
 FROM employees;
 
 -- 4. Test if we can read from companies
@@ -40,7 +40,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- 6. Check if there are any RLS issues
@@ -79,5 +79,5 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );

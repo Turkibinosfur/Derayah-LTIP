@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, DollarSign, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface PortfolioValuationProps {
@@ -19,6 +20,7 @@ export default function PortfolioValuation({
   vestedShares,
   unvestedShares
 }: PortfolioValuationProps) {
+  const { t } = useTranslation();
   const [stockPrice, setStockPrice] = useState<StockPrice>({
     price: 85.50,
     change: 2.30,
@@ -61,8 +63,8 @@ export default function PortfolioValuation({
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold mb-1">Portfolio Value</h3>
-            <p className="text-blue-200 text-sm">Real-time Tadawul pricing</p>
+            <h3 className="text-lg font-semibold mb-1">{t('charts.portfolioValue')}</h3>
+            <p className="text-blue-200 text-sm">{t('charts.realTimeTadawulPricing')}</p>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -73,7 +75,7 @@ export default function PortfolioValuation({
                   : 'bg-white/10 text-blue-200 hover:bg-white/20'
               }`}
             >
-              {autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}
+              {autoRefresh ? t('charts.autoRefreshON') : t('charts.autoRefreshOFF')}
             </button>
             <button
               onClick={refreshPrice}
@@ -88,7 +90,7 @@ export default function PortfolioValuation({
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-blue-200">Stock Symbol:</span>
+              <span className="text-sm text-blue-200">{t('charts.stockSymbol')}</span>
               <span className="text-lg font-bold">{tadawulSymbol}</span>
             </div>
             <div className={`flex items-center space-x-1 ${stockPrice.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
@@ -118,7 +120,7 @@ export default function PortfolioValuation({
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-200 mb-1">Vested Shares Value</p>
+                <p className="text-sm text-blue-200 mb-1">{t('charts.vestedValue')}</p>
                 <p className="text-2xl font-bold">{vestedValue.toLocaleString('en-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</p>
                 <p className="text-xs text-blue-300 mt-1">{vestedShares.toLocaleString()} shares × {stockPrice.price.toFixed(2)} SAR</p>
               </div>
@@ -131,7 +133,7 @@ export default function PortfolioValuation({
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-200 mb-1">Unvested Shares Value</p>
+                <p className="text-sm text-blue-200 mb-1">{t('charts.unvestedValue')}</p>
                 <p className="text-2xl font-bold">{unvestedValue.toLocaleString('en-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</p>
                 <p className="text-xs text-blue-300 mt-1">{unvestedShares.toLocaleString()} shares × {stockPrice.price.toFixed(2)} SAR</p>
               </div>
@@ -144,7 +146,7 @@ export default function PortfolioValuation({
           <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 backdrop-blur-sm rounded-lg p-4 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/90 mb-1 font-semibold">Total Portfolio Value</p>
+                <p className="text-sm text-white/90 mb-1 font-semibold">{t('charts.totalValue')}</p>
                 <p className="text-3xl font-bold">{totalValue.toLocaleString('en-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</p>
                 <p className="text-xs text-white/80 mt-1">{(vestedShares + unvestedShares).toLocaleString()} total shares</p>
               </div>

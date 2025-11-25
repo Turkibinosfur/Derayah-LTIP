@@ -9,7 +9,7 @@ SELECT
   email_confirmed_at,
   created_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 2. Check employee record
 SELECT 
@@ -23,7 +23,7 @@ SELECT
   portal_username,
   company_id
 FROM employees 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 3. Check if employee has grants
 SELECT 
@@ -36,7 +36,7 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 LEFT JOIN incentive_plans ip ON g.plan_id = ip.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 4. Check company
 SELECT 
@@ -58,5 +58,5 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );

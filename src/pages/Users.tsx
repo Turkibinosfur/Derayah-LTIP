@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { Users, MoreVertical, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 type AdminRole =
   | 'company_admin'
@@ -68,6 +70,9 @@ interface AuthUserInfo {
 }
 
 export default function UsersPage() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const { brandColor } = useCompanyColor();
   const [usersList, setUsersList] = useState<ListedUser[]>([]);
   const [authUsersMap, setAuthUsersMap] = useState<Record<string, AuthUserInfo>>({});
   const [loading, setLoading] = useState(true);
@@ -402,9 +407,9 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
+        <div className={isRTL ? 'text-right' : ''}>
           <h1 className="text-3xl font-bold text-gray-900">Company Users</h1>
           <p className="text-gray-600 mt-1">
             Manage administrative users and review their permissions.
@@ -412,7 +417,21 @@ export default function UsersPage() {
         </div>
         <button
           onClick={handleOpenAddModal}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="inline-flex items-center px-4 py-2 text-white text-sm font-semibold rounded-lg shadow-sm focus:outline-none focus:ring-2 transition"
+          style={{ backgroundColor: brandColor }}
+          onMouseEnter={(e) => {
+            const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+            const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+            const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+            e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+            e.currentTarget.style.setProperty('--tw-ring-color', brandColor);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = brandColor;
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.setProperty('--tw-ring-color', brandColor);
+          }}
         >
           Add User
         </button>
@@ -663,7 +682,19 @@ export default function UsersPage() {
               <button
                 onClick={handleSaveEdit}
                 disabled={editSaving}
-                className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 text-sm font-semibold text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                    const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                    const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                    e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
                 type="button"
               >
                 {editSaving ? 'Saving...' : 'Save Changes'}
@@ -823,7 +854,19 @@ export default function UsersPage() {
               <button
                 onClick={handleSaveAddUser}
                 disabled={addSaving}
-                className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 text-sm font-semibold text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
+                style={{ backgroundColor: brandColor }}
+                onMouseEnter={(e) => {
+                  if (!e.currentTarget.disabled) {
+                    const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                    const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                    const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                    e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = brandColor;
+                }}
                 type="button"
               >
                 {addSaving ? 'Saving...' : 'Add User'}

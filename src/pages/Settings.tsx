@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { Building2, Users, Shield, Globe, Save, AlertCircle, TrendingUp, RefreshCw, ChevronDown, Search, X } from 'lucide-react';
 import { TADAWUL_COMPANIES, searchCompanies, getCompanyBySymbol, type TadawulCompany } from '../data/tadawulCompanies';
 import { updateCompanyPriceFromTadawul } from '../lib/tadawulPriceFetcher';
+import { useCompanyColor } from '../hooks/useCompanyColor';
 
 interface CompanySettings {
   id: string;
@@ -20,9 +22,13 @@ interface CompanySettings {
   share_price: number | null;
   fmv_source: 'manual' | 'tadawul' | null;
   last_price_fetch?: string | null;
+  brand_color?: string;
 }
 
 export default function Settings() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const { brandColor } = useCompanyColor();
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -69,6 +75,7 @@ export default function Settings() {
             : null,
           fmv_source: (company.fmv_source as CompanySettings['fmv_source']) ?? 'tadawul',
           last_price_fetch: company.last_price_fetch || null,
+          brand_color: company.brand_color || '#2563EB',
         });
         
         setSelectedMarket(market);
@@ -82,7 +89,7 @@ export default function Settings() {
 
   const handleFetchPrice = async () => {
     if (!settings || !settings.tadawul_symbol) {
-      setMessage({ type: 'error', text: 'Please select a Tadawul symbol first.' });
+      setMessage({ type: 'error', text: t('settings.pleaseSelectTadawulSymbol') });
       return;
     }
 
@@ -134,7 +141,7 @@ export default function Settings() {
       }
     } catch (error: any) {
       console.error('Error fetching price:', error);
-      setMessage({ type: 'error', text: error?.message || 'Failed to fetch price from Tadawul' });
+      setMessage({ type: 'error', text: error?.message || t('settings.failedToFetchPrice') });
     } finally {
       setFetchingPrice(false);
     }
@@ -205,6 +212,10 @@ export default function Settings() {
                        settings.current_fmv !== sharePrice &&
                        settings.current_fmv > 0;
 
+      // Validate brand_color
+      const brandColor = settings.brand_color || '#2563EB';
+      const validColor = /^#[0-9A-F]{6}$/i.test(brandColor) ? brandColor : '#2563EB';
+
       const { error } = await supabase
         .from('companies')
         .update({
@@ -214,6 +225,7 @@ export default function Settings() {
           tadawul_symbol: symbol,
           current_fmv: sharePrice,
           fmv_source: useManual ? 'manual' : (sharePrice ? 'tadawul' : null),
+          brand_color: validColor,
           updated_at: new Date().toISOString(),
         })
         .eq('id', settings.id);
@@ -231,10 +243,33 @@ export default function Settings() {
           : prev
       );
 
-      setMessage({ type: 'success', text: 'Settings saved successfully' });
-    } catch (error) {
+      setMessage({ type: 'success', text: t('settings.settingsSavedSuccessfully') });
+    } catch (error: any) {
       console.error('Error saving settings:', error);
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      
+      // Extract detailed error message
+      let errorMessage = t('settings.failedToSaveSettings');
+      
+      // Handle Supabase PostgREST errors
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.error?.message) {
+        errorMessage = error.error.message;
+      } else if (error?.error && typeof error.error === 'string') {
+        errorMessage = error.error;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
+      // Check for RLS policy errors specifically
+      if (errorMessage.includes('permission denied') || errorMessage.includes('new row violates row-level security')) {
+        errorMessage = 'Permission denied: You do not have permission to update company settings. Please contact your administrator.';
+      }
+      
+      setMessage({ 
+        type: 'error', 
+        text: `Failed to save settings: ${errorMessage}` 
+      });
     } finally {
       setSaving(false);
     }
@@ -269,7 +304,10 @@ export default function Settings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div 
+          className="animate-spin rounded-full h-12 w-12 border-b-2"
+          style={{ borderBottomColor: brandColor }}
+        ></div>
       </div>
     );
   }
@@ -278,17 +316,17 @@ export default function Settings() {
     return (
       <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
         <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-bold text-gray-900 mb-2">No Company Found</h3>
-        <p className="text-gray-600">Unable to load company settings</p>
+        <h3 className="text-lg font-bold text-gray-900 mb-2">{t('settings.noCompanyFound')}</h3>
+        <p className="text-gray-600">{t('settings.unableToLoadSettings')}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your company configuration and preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('settings.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('settings.description')}</p>
       </div>
 
       {message && (
@@ -309,10 +347,13 @@ export default function Settings() {
       <div className="bg-white rounded-xl border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Building2 className="w-5 h-5 text-blue-600" />
+            <div 
+              className="p-2 rounded-lg"
+              style={{ backgroundColor: `${brandColor}15` }}
+            >
+              <Building2 className="w-5 h-5" style={{ color: brandColor }} />
             </div>
-            <h2 className="text-lg font-bold text-gray-900">Company Information</h2>
+            <h2 className="text-lg font-bold text-gray-900">{t('settings.companyInformation')}</h2>
           </div>
         </div>
 
@@ -357,7 +398,7 @@ export default function Settings() {
                 disabled
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500 mt-1">Cannot be changed</p>
+              <p className="text-xs text-gray-500 mt-1">{t('settings.cannotBeChanged')}</p>
             </div>
 
             <div>
@@ -391,9 +432,10 @@ export default function Settings() {
                   }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                     selectedMarket === 'main'
-                      ? 'bg-blue-600 text-white'
+                      ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
+                  style={selectedMarket === 'main' ? { backgroundColor: brandColor } : {}}
                 >
                   Main Market
                 </button>
@@ -406,9 +448,10 @@ export default function Settings() {
                   }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                     selectedMarket === 'nomu'
-                      ? 'bg-blue-600 text-white'
+                      ? 'text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
+                  style={selectedMarket === 'nomu' ? { backgroundColor: brandColor } : {}}
                 >
                   NOMU Market
                 </button>
@@ -534,7 +577,24 @@ export default function Settings() {
                   type="button"
                   onClick={handleFetchPrice}
                   disabled={fetchingPrice || !settings.tadawul_symbol}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+                  className="px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+                  style={{ 
+                    backgroundColor: brandColor,
+                    opacity: fetchingPrice || !settings.tadawul_symbol ? 0.5 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!fetchingPrice && settings.tadawul_symbol) {
+                      const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+                      const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+                      const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+                      e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!fetchingPrice && settings.tadawul_symbol) {
+                      e.currentTarget.style.backgroundColor = brandColor;
+                    }
+                  }}
                   title="Fetch latest price from Tadawul (may be delayed up to 15 minutes)"
                 >
                   {fetchingPrice ? (
@@ -545,7 +605,7 @@ export default function Settings() {
                   ) : (
                     <>
                       <TrendingUp className="w-4 h-4" />
-                      <span className="hidden sm:inline">Fetch</span>
+                      <span className="hidden sm:inline">{t('settings.fetchPrice')}</span>
                     </>
                   )}
                 </button>
@@ -557,7 +617,7 @@ export default function Settings() {
                   ) : settings.fmv_source === 'manual' ? (
                     <span className="text-blue-600">Source: Manual</span>
                   ) : (
-                    <span className="text-gray-500">Not set</span>
+                    <span className="text-gray-500">{t('settings.notSet')}</span>
                   )}
                 </p>
                 {settings.last_price_fetch && (
@@ -590,10 +650,46 @@ export default function Settings() {
                   });
                 }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Optional override"
+                placeholder={t('settings.optionalOverride')}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Optional: Override share price with manual FMV. Leave blank to use share price above.
+              </p>
+            </div>
+
+            {/* Brand Color */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Brand Color
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="color"
+                  value={settings.brand_color || '#2563EB'}
+                  onChange={(e) =>
+                    setSettings({ ...settings, brand_color: e.target.value })
+                  }
+                  className="w-20 h-10 border border-gray-300 rounded-lg cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={settings.brand_color || '#2563EB'}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^#[0-9A-F]{0,6}$/i.test(value) || value === '') {
+                      setSettings({ 
+                        ...settings, 
+                        brand_color: value === '' ? '#2563EB' : (value.startsWith('#') ? value : `#${value}`).substring(0, 7)
+                      });
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                  placeholder="#2563EB"
+                  maxLength={7}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Choose your company's primary brand color. This will be used throughout the portal for buttons, highlights, and UI elements.
               </p>
             </div>
           </div>
@@ -606,35 +702,35 @@ export default function Settings() {
             <div className="p-2 bg-green-100 rounded-lg">
               <Shield className="w-5 h-5 text-green-600" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900">Share Pool Configuration</h2>
+            <h2 className="text-lg font-bold text-gray-900">{t('settings.sharePoolConfiguration')}</h2>
           </div>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Reserved</p>
+              <p className="text-sm text-gray-600 mb-1">{t('settings.totalReserved')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {Number(settings.total_reserved_shares).toLocaleString()}
               </p>
             </div>
 
             <div className="p-4 bg-green-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Available</p>
+              <p className="text-sm text-gray-600 mb-1">{t('settings.available')}</p>
               <p className="text-2xl font-bold text-green-700">
                 {Number(settings.available_shares).toLocaleString()}
               </p>
             </div>
 
             <div className="p-4 bg-orange-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Granted</p>
+              <p className="text-sm text-gray-600 mb-1">{t('settings.granted')}</p>
               <p className="text-2xl font-bold text-orange-700">
                 {Number(settings.shares_granted).toLocaleString()}
               </p>
             </div>
 
             <div className="p-4 bg-purple-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Vested</p>
+              <p className="text-sm text-gray-600 mb-1">{t('settings.vested')}</p>
               <p className="text-2xl font-bold text-purple-700">
                 {Number(settings.shares_vested).toLocaleString()}
               </p>
@@ -660,10 +756,27 @@ export default function Settings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="flex items-center space-x-2 px-6 py-3 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition"
+          style={{ 
+            backgroundColor: brandColor,
+            opacity: saving ? 0.5 : 1
+          }}
+          onMouseEnter={(e) => {
+            if (!saving) {
+              const rgb = parseInt(brandColor.slice(1, 3), 16) * 0.9;
+              const gg = parseInt(brandColor.slice(3, 5), 16) * 0.9;
+              const bb = parseInt(brandColor.slice(5, 7), 16) * 0.9;
+              e.currentTarget.style.backgroundColor = `rgb(${Math.round(rgb)}, ${Math.round(gg)}, ${Math.round(bb)})`;
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!saving) {
+              e.currentTarget.style.backgroundColor = brandColor;
+            }
+          }}
         >
           <Save className="w-5 h-5" />
-          <span className="font-medium">{saving ? 'Saving...' : 'Save Changes'}</span>
+          <span className="font-medium">{saving ? t('settings.saving') : t('settings.saveChanges')}</span>
         </button>
       </div>
     </div>

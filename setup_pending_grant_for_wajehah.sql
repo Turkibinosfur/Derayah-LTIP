@@ -1,4 +1,4 @@
--- Setup Pending Grant for wajehah.sa@gmail.com
+-- Setup Pending Grant for employee@example.com
 -- This script ensures the employee has a pending grant that should appear in the dashboard
 
 -- 1. Check current state
@@ -15,7 +15,7 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 2. Check existing grants
 SELECT 
@@ -29,7 +29,7 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 LEFT JOIN incentive_plans ip ON g.plan_id = ip.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 3. Ensure company and incentive plan exist
 DO $$
@@ -97,7 +97,7 @@ BEGIN
   -- Get employee ID
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     RAISE EXCEPTION 'Employee not found. Please run the employee setup script first.';
@@ -169,7 +169,7 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- 5. Check grants that should appear in dashboard
 SELECT 
@@ -187,6 +187,6 @@ SELECT
 FROM grants g
 JOIN employees e ON g.employee_id = e.id
 LEFT JOIN incentive_plans ip ON g.plan_id = ip.id
-WHERE e.email = 'wajehah.sa@gmail.com'
+WHERE e.email = 'employee@example.com'
   AND g.status IN ('active', 'pending_signature')
 ORDER BY g.created_at DESC;

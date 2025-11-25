@@ -1,4 +1,4 @@
--- Ensure wajehah.com@gmail.com and wajehah.sa@gmail.com have employee records
+-- Ensure wajehah.com@gmail.com and employee@example.com have employee records
 -- Run this SQL directly in your Supabase SQL Editor
 
 -- First, let's see what employees currently exist
@@ -62,7 +62,7 @@ WHERE NOT EXISTS (
   AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')
 );
 
--- For wajehah.sa@gmail.com
+-- For employee@example.com
 INSERT INTO employees (
   id,
   company_id,
@@ -86,7 +86,7 @@ SELECT
   (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial'),
   'EMP-FATIMA-001',
   '1234567891',
-  'wajehah.sa@gmail.com',
+  'employee@example.com',
   'Fatima',
   'Al-Zahrani',
   'Finance',
@@ -100,7 +100,7 @@ SELECT
   now()
 WHERE NOT EXISTS (
   SELECT 1 FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com' 
+  WHERE email = 'employee@example.com' 
   AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')
 );
 
@@ -116,7 +116,7 @@ UPDATE employees
 SET portal_access_enabled = true,
     portal_username = 'wajehah.sa',
     portal_password = 'WajehahSa123!'
-WHERE email = 'wajehah.sa@gmail.com'
+WHERE email = 'employee@example.com'
 AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial');
 
 -- Show final results
@@ -135,7 +135,7 @@ FROM employees
 WHERE company_id = (
   SELECT id FROM companies WHERE company_name_en = 'Derayah Financial'
 )
-AND email IN ('wajehah.com@gmail.com', 'wajehah.sa@gmail.com')
+AND email IN ('wajehah.com@gmail.com', 'employee@example.com')
 ORDER BY email;
 
 -- Show all employees

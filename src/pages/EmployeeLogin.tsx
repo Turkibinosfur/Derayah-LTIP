@@ -10,7 +10,7 @@ export default function EmployeeLogin() {
       (location.state as { presetEmail?: string; presetPassword?: string } | null) ?? null,
     [location.state]
   );
-  const [email, setEmail] = useState(locationState?.presetEmail ?? 'wajehah.sa@gmail.com');
+  const [email, setEmail] = useState(locationState?.presetEmail ?? 'employee@example.com');
   const [password, setPassword] = useState(locationState?.presetPassword ?? 'Employee123!');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

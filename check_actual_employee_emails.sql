@@ -36,9 +36,9 @@ SELECT
 -- Check for Sarah's updated email
 SELECT 
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com' AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')) 
-    THEN '✓ wajehah.sa@gmail.com EXISTS'
-    ELSE '✗ wajehah.sa@gmail.com NOT FOUND'
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com' AND company_id = (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial')) 
+    THEN '✓ employee@example.com EXISTS'
+    ELSE '✗ employee@example.com NOT FOUND'
   END as sarah_updated;
 
 -- Check for Khalid's email
@@ -66,5 +66,5 @@ FROM employees
 WHERE company_id = (
   SELECT id FROM companies WHERE company_name_en = 'Derayah Financial'
 )
-AND email NOT IN ('sarah.mansouri@derayah.com', 'khalid.zahrani@derayah.com', 'fatima.rashid@derayah.com', 'wajehah.sa@gmail.com')
+AND email NOT IN ('sarah.mansouri@derayah.com', 'khalid.zahrani@derayah.com', 'fatima.rashid@derayah.com', 'employee@example.com')
 ORDER BY email;

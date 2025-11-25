@@ -268,27 +268,32 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200">
+    <div className="bg-white rounded-xl border border-gray-200 w-full max-w-full overflow-hidden">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {viewMode === 'monthly'
-              ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
-              : viewMode === 'annually'
-                ? `${currentDate.getFullYear()}`
-                : decadeYearRange.label
-          }
+      <div className="flex flex-col gap-3 p-3 sm:p-4 border-b border-gray-200 w-full max-w-full">
+        {/* Title Row */}
+        <div className="flex items-center justify-between w-full max-w-full gap-2">
+          <h3 className="text-sm sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 truncate">
+            {viewMode === 'monthly' ? (
+              `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+            ) : viewMode === 'annually' ? (
+              `${currentDate.getFullYear()}`
+            ) : (
+              <>
+                <span className="hidden sm:inline truncate block">{decadeYearRange.label}</span>
+                <span className="sm:hidden truncate block">{decadeYearRange.start} - {decadeYearRange.end}</span>
+              </>
+            )}
           </h3>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
             <button
               onClick={goToToday}
-              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition"
+              className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 active:bg-blue-300 transition whitespace-nowrap touch-manipulation"
             >
               Today
             </button>
             <div
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white"
+              className="inline-flex h-7 sm:h-8 w-7 sm:w-8 items-center justify-center rounded-full bg-gray-900 text-xs sm:text-sm font-semibold text-white flex-shrink-0"
               title="Total vesting events in view"
             >
               {totalEventsForView}
@@ -296,46 +301,51 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        {/* Controls Row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full max-w-full">
           {/* View Mode Switch */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center bg-gray-100 rounded-lg p-0.5 sm:p-1 w-full sm:flex-1 sm:min-w-0 sm:max-w-full">
             <button
               onClick={() => setViewMode('monthly')}
-              className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1.5 sm:py-1 rounded-md text-[10px] sm:text-sm font-medium transition flex-1 sm:flex-none touch-manipulation min-w-0 ${
                 viewMode === 'monthly'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900 active:bg-gray-200'
               }`}
             >
-              <Calendar className="w-4 h-4" />
-              Monthly
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline truncate">Monthly</span>
+              <span className="sm:hidden">M</span>
             </button>
             <button
               onClick={() => setViewMode('annually')}
-              className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1.5 sm:py-1 rounded-md text-[10px] sm:text-sm font-medium transition flex-1 sm:flex-none touch-manipulation min-w-0 ${
                 viewMode === 'annually'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900 active:bg-gray-200'
               }`}
             >
-              <List className="w-4 h-4" />
-              Annually
+              <List className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline truncate">Annually</span>
+              <span className="sm:hidden">Y</span>
             </button>
             <button
               onClick={() => setViewMode('decade')}
-              className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1.5 sm:py-1 rounded-md text-[10px] sm:text-sm font-medium transition flex-1 sm:flex-none touch-manipulation min-w-0 ${
                 viewMode === 'decade'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-gray-900 active:bg-gray-200'
               }`}
             >
-              <TrendingUp className="w-4 h-4" />
-              10-Year Outlook
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden lg:inline truncate">10-Year Outlook</span>
+              <span className="hidden sm:inline lg:hidden truncate">10Y Outlook</span>
+              <span className="sm:hidden">10Y</span>
             </button>
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 self-center sm:self-auto">
             <button
               onClick={() => {
                 if (viewMode === 'monthly') {
@@ -346,9 +356,10 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                   navigateDecade('prev');
                 }
               }}
-              className="p-2 hover:bg-gray-100 rounded-md transition"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-md transition touch-manipulation"
+              aria-label="Previous"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
             <button
               onClick={() => {
@@ -360,90 +371,93 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                   navigateDecade('next');
                 }
               }}
-              className="p-2 hover:bg-gray-100 rounded-md transition"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-md transition touch-manipulation"
+              aria-label="Next"
             >
-              <ChevronRight className="w-5 h-5 text-gray-600" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Calendar Content */}
-      <div className="p-4">
+      <div className="p-2 sm:p-4 w-full max-w-full overflow-x-auto">
         {viewMode === 'monthly' ? (
-          <>
-            {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames.map(day => (
-                <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map((day, index) => (
-                <div
-                  key={index}
-                  className={`min-h-[100px] p-2 border rounded-lg ${
-                    day.isCurrentMonth ? 'bg-white' : 'bg-gray-50'
-                  } ${day.isToday ? 'ring-2 ring-blue-500' : 'border-gray-200'}`}
-                >
-                  {/* Date Number */}
-                  <div className={`text-sm font-medium mb-1 ${
-                    day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                  } ${day.isToday ? 'text-blue-600' : ''}`}>
-                    {day.date.getDate()}
+          <div className="overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-0">
+            <div className="min-w-[600px]">
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {dayNames.map(day => (
+                  <div key={day} className="p-1.5 sm:p-2 text-center text-xs sm:text-sm font-medium text-gray-500">
+                    {day}
                   </div>
+                ))}
+              </div>
 
-                  {/* Events */}
-                  <div className="space-y-1">
-                    {day.events.slice(0, 3).map((event, eventIndex) => (
-                      <div
-                        key={event.id}
-                        onClick={() => onEventClick?.(event)}
-                        className={`p-1 rounded text-xs cursor-pointer hover:opacity-80 transition ${getStatusColor(event.status)}`}
-                        title={`${event.employee_name} - ${event.plan_name} (${event.shares_to_vest} shares)`}
-                      >
-                        <div className="flex items-center gap-1">
-                          <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.event_type)}`} />
-                          <span className="truncate font-medium">
-                            {event.employee_name.split(' ')[0]}
-                          </span>
+              {/* Calendar Days */}
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map((day, index) => (
+                  <div
+                    key={index}
+                    className={`min-h-[90px] sm:min-h-[100px] p-1.5 sm:p-2 border rounded-lg ${
+                      day.isCurrentMonth ? 'bg-white' : 'bg-gray-50'
+                    } ${day.isToday ? 'ring-2 ring-blue-500' : 'border-gray-200'}`}
+                  >
+                    {/* Date Number */}
+                    <div className={`text-xs sm:text-sm font-medium mb-1 ${
+                      day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                    } ${day.isToday ? 'text-blue-600' : ''}`}>
+                      {day.date.getDate()}
+                    </div>
+
+                    {/* Events */}
+                    <div className="space-y-0.5 sm:space-y-1">
+                      {day.events.slice(0, 2).map((event, eventIndex) => (
+                        <div
+                          key={event.id}
+                          onClick={() => onEventClick?.(event)}
+                          className={`p-0.5 sm:p-1 rounded text-[10px] sm:text-xs cursor-pointer hover:opacity-80 active:opacity-60 transition touch-manipulation ${getStatusColor(event.status)}`}
+                          title={`${event.employee_name} - ${event.plan_name} (${event.shares_to_vest} shares)`}
+                        >
+                          <div className="flex items-center gap-0.5 sm:gap-1">
+                            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${getEventTypeColor(event.event_type)} flex-shrink-0`} />
+                            <span className="truncate font-medium text-[10px] sm:text-xs">
+                              {event.employee_name.split(' ')[0]}
+                            </span>
+                          </div>
+                          <div className="text-gray-600 truncate text-[9px] sm:text-[10px]">
+                            {Math.floor(event.shares_to_vest).toLocaleString()}
+                          </div>
                         </div>
-                        <div className="text-gray-600 truncate">
-                          {Math.floor(event.shares_to_vest).toLocaleString()} shares
+                      ))}
+                      
+                      {/* Show "more" indicator if there are additional events */}
+                      {day.events.length > 2 && (
+                        <div className="text-[9px] sm:text-[10px] text-gray-500 text-center py-0.5">
+                          +{day.events.length - 2}
                         </div>
-                      </div>
-                    ))}
-                    
-                    {/* Show "more" indicator if there are additional events */}
-                    {day.events.length > 3 && (
-                      <div className="text-xs text-gray-500 text-center py-1">
-                        +{day.events.length - 3} more
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </>
+          </div>
         ) : viewMode === 'annually' ? (
           /* Annual View */
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-4 w-full max-w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
               {yearlyEvents.map((monthData) => (
                 <div
                   key={monthData.month}
-                  className={`p-4 rounded-lg border transition hover:shadow-md ${
+                  className={`p-3 sm:p-4 rounded-lg border transition hover:shadow-md ${
                     monthData.eventCount > 0 ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-gray-900">{monthData.monthName}</h4>
+                  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900">{monthData.monthName}</h4>
                     {monthData.eventCount > 0 && (
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full whitespace-nowrap">
                         {monthData.eventCount} events
                       </span>
                     )}
@@ -451,7 +465,7 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                   
                   {monthData.eventCount > 0 ? (
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="text-gray-600">Total Shares:</span>
                         <span className="font-medium">{Math.floor(monthData.totalShares).toLocaleString()}</span>
                       </div>
@@ -461,19 +475,19 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                           <div
                             key={event.id}
                             onClick={() => onEventClick?.(event)}
-                            className="flex items-center justify-between p-2 bg-white rounded cursor-pointer hover:bg-gray-50 transition"
+                            className="flex items-center justify-between p-2 bg-white rounded cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition touch-manipulation"
                           >
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.event_type)}`} />
-                              <span className="text-sm font-medium truncate">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.event_type)} flex-shrink-0`} />
+                              <span className="text-xs sm:text-sm font-medium truncate">
                                 {event.employee_name.split(' ')[0]}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500">
+                            <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                              <span className="text-xs text-gray-500 whitespace-nowrap">
                                 {new Date(event.vesting_date).getDate()}
                               </span>
-                              <span className={`px-1 py-0.5 text-xs rounded ${getStatusColor(event.status)}`}>
+                              <span className={`px-1 py-0.5 text-xs rounded ${getStatusColor(event.status)} whitespace-nowrap`}>
                                 {event.status.charAt(0).toUpperCase()}
                               </span>
                             </div>
@@ -491,8 +505,8 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                     </div>
                   ) : (
                     <div className="text-center py-4">
-                      <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-400">No events</p>
+                      <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-xs sm:text-sm text-gray-400">No events</p>
                     </div>
                   )}
                 </div>
@@ -500,32 +514,32 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
             </div>
             
             {/* Annual Summary */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold text-gray-900 mb-3">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">
                 {currentDate.getFullYear()} Summary
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                 <div>
                   <span className="text-gray-600">Total Events:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {yearlyEvents.reduce((sum, month) => sum + month.eventCount, 0)}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Total Shares:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {Math.floor(yearlyEvents.reduce((sum, month) => sum + month.totalShares, 0)).toLocaleString()}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Active Months:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {yearlyEvents.filter(month => month.eventCount > 0).length}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Peak Month:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {yearlyEvents.reduce((peak, month) => 
                       month.eventCount > peak.eventCount ? month : peak
                     ).monthName}
@@ -536,19 +550,19 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
           </div>
         ) : (
           /* Decade View */
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-4 w-full max-w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-full">
               {decadeEvents.map((yearData) => (
                 <div
                   key={yearData.year}
-                  className={`p-4 rounded-lg border transition hover:shadow-md ${
+                  className={`p-3 sm:p-4 rounded-lg border transition hover:shadow-md ${
                     yearData.eventCount > 0 ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-semibold text-gray-900">{yearData.year}</h4>
+                  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900">{yearData.year}</h4>
                     {yearData.eventCount > 0 && (
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full whitespace-nowrap">
                         {yearData.eventCount} events
                       </span>
                     )}
@@ -556,33 +570,34 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
 
                   {yearData.eventCount > 0 ? (
                     <>
-                      <div className="flex justify-between text-sm mb-3">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 text-xs sm:text-sm mb-2 sm:mb-3">
                         <span className="text-gray-600">Total Shares:</span>
-                        <span className="font-medium">{Math.floor(yearData.totalShares).toLocaleString()}</span>
+                        <span className="font-medium text-gray-900">{Math.floor(yearData.totalShares).toLocaleString()}</span>
                       </div>
                       {yearData.peakMonth && (
-                        <div className="text-sm text-gray-600 mb-3">
-                          Peak month: <span className="font-medium text-gray-900">{yearData.peakMonth}</span>
+                        <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
+                          <span className="hidden sm:inline">Peak month: </span>
+                          <span className="font-medium text-gray-900">{yearData.peakMonth}</span>
                         </div>
                       )}
-                      <div className="space-y-2">
+                      <div className="space-y-1.5 sm:space-y-2">
                         {yearData.sampleEvents.map((event) => (
                           <div
                             key={event.id}
                             onClick={() => onEventClick?.(event)}
-                            className="flex items-center justify-between p-2 bg-white rounded cursor-pointer border border-gray-200 hover:bg-gray-50 transition"
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 p-2 bg-white rounded cursor-pointer border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition touch-manipulation"
                           >
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.event_type)}`} />
-                              <span className="text-sm font-medium truncate">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <div className={`w-2 h-2 rounded-full ${getEventTypeColor(event.event_type)} flex-shrink-0`} />
+                              <span className="text-xs sm:text-sm font-medium truncate">
                                 {event.employee_name.split(' ')[0]}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500">
+                            <div className="flex items-center gap-2 flex-shrink-0 ml-5 sm:ml-2">
+                              <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
                                 {monthNames[new Date(event.vesting_date).getMonth()]} {new Date(event.vesting_date).getDate()}
                               </span>
-                              <span className={`px-1 py-0.5 text-xs rounded ${getStatusColor(event.status)}`}>
+                              <span className={`px-1.5 py-0.5 text-[10px] sm:text-xs rounded ${getStatusColor(event.status)} whitespace-nowrap`}>
                                 {event.status.charAt(0).toUpperCase()}
                               </span>
                             </div>
@@ -591,7 +606,7 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                       </div>
                       {yearData.sampleEvents.length < yearData.eventCount && (
                         <div className="text-center py-1">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-[10px] sm:text-xs text-gray-500">
                             +{yearData.eventCount - yearData.sampleEvents.length} more events
                           </span>
                         </div>
@@ -599,8 +614,8 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
                     </>
                   ) : (
                     <div className="text-center py-4">
-                      <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-400">No events</p>
+                      <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-xs sm:text-sm text-gray-400">No events</p>
                     </div>
                   )}
                 </div>
@@ -608,32 +623,32 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
             </div>
 
             {/* Decade Summary */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold text-gray-900 mb-3">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">
                 Upcoming 10-Year Summary
               </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                 <div>
                   <span className="text-gray-600">Total Events:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {decadeSummary.totalEvents}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Total Shares:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {Math.floor(decadeSummary.totalShares).toLocaleString()}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Active Years:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {decadeSummary.activeYears}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Peak Year:</span>
-                  <span className="ml-2 font-medium">
+                  <span className="ml-2 font-medium block sm:inline">
                     {decadeSummary.peakYear ?? '—'}
                   </span>
                 </div>
@@ -644,35 +659,35 @@ export default function VestingEventsCalendar({ events, onEventClick }: VestingE
       </div>
 
       {/* Legend */}
-      <div className="px-4 pb-4 border-t border-gray-200 pt-4">
-        <div className="flex flex-wrap items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
+      <div className="px-3 sm:px-4 pb-3 sm:pb-4 border-t border-gray-200 pt-3 sm:pt-4 w-full max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm w-full max-w-full">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="font-medium text-gray-700">Event Types:</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-orange-500 flex-shrink-0" />
               <span className="text-gray-600">Cliff</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500 flex-shrink-0" />
               <span className="text-gray-600">Vesting</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-purple-500" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-purple-500 flex-shrink-0" />
               <span className="text-gray-600">Performance</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="font-medium text-gray-700">Status:</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-red-500 bg-red-50" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 border-2 border-red-500 bg-red-50 flex-shrink-0" />
               <span className="text-gray-600">Due</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-blue-500 bg-blue-50" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 border-2 border-blue-500 bg-blue-50 flex-shrink-0" />
               <span className="text-gray-600">Pending</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border-2 border-green-500 bg-green-50" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 border-2 border-green-500 bg-green-50 flex-shrink-0" />
               <span className="text-gray-600">Vested</span>
             </div>
           </div>

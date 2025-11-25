@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { TrendingUp, Briefcase, Lock, DollarSign, Calendar, AlertCircle, ArrowRightLeft, Package, Activity } from 'lucide-react';
 import { formatDate } from '../lib/dateUtils';
@@ -42,6 +43,8 @@ interface RecentTransfer {
 }
 
 export default function Portfolio() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [portfolios, setPortfolios] = useState<PortfolioData[]>([]);
   const [grantSummary, setGrantSummary] = useState<GrantSummary>({
     total_grants: 0,
@@ -302,10 +305,10 @@ export default function Portfolio() {
   const employeeVested = portfolios.find(p => p.portfolio_type === 'employee_vested');
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Portfolio Management</h1>
-        <p className="text-gray-600 mt-1">Track and manage share portfolios</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('portfolio.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('portfolio.description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -315,7 +318,7 @@ export default function Portfolio() {
               <Briefcase className="w-6 h-6 text-blue-600" />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-1">LTIP Pool Allocated</p>
+          <p className="text-sm text-gray-600 mb-1">{t('portfolio.ltipPoolAllocated')}</p>
           <p className="text-2xl font-bold text-gray-900">
             {planSummary.total_allocated.toLocaleString()}
           </p>
@@ -330,7 +333,7 @@ export default function Portfolio() {
               <TrendingUp className="w-6 h-6 text-green-600" />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-1">Granted Shares</p>
+          <p className="text-sm text-gray-600 mb-1">{t('portfolio.grantedShares')}</p>
           <p className="text-2xl font-bold text-gray-900">
             {grantSummary.total_shares.toLocaleString()}
           </p>
@@ -345,7 +348,7 @@ export default function Portfolio() {
               <DollarSign className="w-6 h-6 text-emerald-600" />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-1">Vested Shares</p>
+          <p className="text-sm text-gray-600 mb-1">{t('portfolio.vestedShares')}</p>
           <p className="text-2xl font-bold text-emerald-600">
             {grantSummary.vested_shares.toLocaleString()}
           </p>
@@ -360,7 +363,7 @@ export default function Portfolio() {
               <Calendar className="w-6 h-6 text-amber-600" />
             </div>
           </div>
-          <p className="text-sm text-gray-600 mb-1">Unvested Shares</p>
+          <p className="text-sm text-gray-600 mb-1">{t('portfolio.unvestedShares')}</p>
           <p className="text-2xl font-bold text-gray-900">
             {grantSummary.unvested_shares.toLocaleString()}
           </p>
@@ -372,24 +375,24 @@ export default function Portfolio() {
 
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Grant Summary</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('portfolio.grantSummary')}</h2>
         </div>
         <div className="p-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-              <span className="text-sm text-gray-600">Total Grants Issued</span>
+              <span className="text-sm text-gray-600">{t('portfolio.totalGrantsIssued')}</span>
               <span className="text-lg font-semibold text-gray-900">{grantSummary.total_grants}</span>
             </div>
             <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-              <span className="text-sm text-gray-600">Total Shares Granted</span>
+              <span className="text-sm text-gray-600">{t('portfolio.totalSharesGranted')}</span>
               <span className="text-lg font-semibold text-gray-900">{grantSummary.total_shares.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-              <span className="text-sm text-gray-600">Vested Shares</span>
+              <span className="text-sm text-gray-600">{t('portfolio.vestedSharesLabel')}</span>
               <span className="text-lg font-semibold text-green-600">{grantSummary.vested_shares.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Unvested Shares</span>
+              <span className="text-sm text-gray-600">{t('portfolio.unvestedSharesLabel')}</span>
               <span className="text-lg font-semibold text-gray-900">{grantSummary.unvested_shares.toLocaleString()}</span>
             </div>
           </div>
@@ -419,7 +422,7 @@ export default function Portfolio() {
                     ? 'bg-green-100 text-green-800' 
                     : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {Number(companyReserved.available_shares) > 0 ? 'Active' : 'Fully Allocated'}
+                  {Number(companyReserved.available_shares) > 0 ? t('portfolio.active') : t('portfolio.fullyAllocated')}
                 </span>
               </div>
             </div>
@@ -430,28 +433,28 @@ export default function Portfolio() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-gray-600">Total Shares</p>
+                  <p className="text-sm text-gray-600">{t('portfolio.totalShares')}</p>
                   <Briefcase className="w-4 h-4 text-gray-400" />
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{Number(companyReserved.total_shares).toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   {companyReserved.total_shares > 0 
                     ? `${((companyReserved.total_shares / (planSummary.total_allocated || companyReserved.total_shares)) * 100).toFixed(1)}% of LTIP Pool`
-                    : 'No shares allocated'
+                    : t('portfolio.noSharesAllocated')
                   }
                 </p>
               </div>
               
               <div className="bg-green-50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-gray-600">Available</p>
+                  <p className="text-sm text-gray-600">{t('portfolio.available')}</p>
                   <TrendingUp className="w-4 h-4 text-green-400" />
                 </div>
                 <p className="text-2xl font-bold text-green-600">{Number(companyReserved.available_shares).toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   {companyReserved.total_shares > 0 
                     ? `${((companyReserved.available_shares / companyReserved.total_shares) * 100).toFixed(1)}% of total`
-                    : 'No shares available'
+                    : t('portfolio.noSharesAvailable')
                   }
                 </p>
               </div>
@@ -465,7 +468,7 @@ export default function Portfolio() {
                 <p className="text-xs text-gray-500 mt-1">
                   {companyReserved.total_shares > 0 
                     ? `${((companyReserved.locked_shares / companyReserved.total_shares) * 100).toFixed(1)}% of total`
-                    : 'No shares locked'
+                    : t('portfolio.noSharesLocked')
                   }
                 </p>
               </div>
@@ -495,7 +498,7 @@ export default function Portfolio() {
                 <div className="flex items-center justify-between mt-2 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded"></div>
-                    <span>Available</span>
+                    <span>{t('portfolio.available')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-amber-500 rounded"></div>
@@ -514,21 +517,21 @@ export default function Portfolio() {
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <div className="flex-1 text-center">
                   <div className="bg-blue-50 rounded-lg p-3 mb-2">
-                    <p className="font-semibold text-blue-900">LTIP Pools</p>
+                    <p className="font-semibold text-blue-900">{t('portfolio.ltipPools')}</p>
                     <p className="text-blue-700">{planSummary.total_allocated.toLocaleString()} shares</p>
                   </div>
                 </div>
                 <ArrowRightLeft className="w-5 h-5 text-gray-400 mx-2" />
                 <div className="flex-1 text-center">
                   <div className="bg-purple-50 rounded-lg p-3 mb-2">
-                    <p className="font-semibold text-purple-900">Company Portfolio</p>
+                    <p className="font-semibold text-purple-900">{t('portfolio.companyPortfolio')}</p>
                     <p className="text-purple-700">{companyReserved.total_shares.toLocaleString()} shares</p>
                   </div>
                 </div>
                 <ArrowRightLeft className="w-5 h-5 text-gray-400 mx-2" />
                 <div className="flex-1 text-center">
                   <div className="bg-green-50 rounded-lg p-3 mb-2">
-                    <p className="font-semibold text-green-900">Employee Grants</p>
+                    <p className="font-semibold text-green-900">{t('portfolio.employeeGrants')}</p>
                     <p className="text-green-700">{grantSummary.total_shares.toLocaleString()} shares</p>
                   </div>
                 </div>
@@ -544,9 +547,9 @@ export default function Portfolio() {
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <ArrowRightLeft className="w-5 h-5 text-blue-600" />
-              Recent Share Transfers
+              {t('portfolio.recentTransfers')}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">Latest share movements from company portfolio</p>
+            <p className="text-sm text-gray-600 mt-1">{t('portfolio.latestShareMovements')}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -616,7 +619,7 @@ export default function Portfolio() {
         <div className="flex items-start space-x-3">
           <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-blue-900 mb-1">Portfolio Overview</h3>
+            <h3 className="text-sm font-semibold text-blue-900 mb-1">{t('portfolio.portfolioOverview')}</h3>
             <p className="text-sm text-blue-800 mb-2">
               <strong>LTIP Pool:</strong> Total shares allocated across all LTIP pools or incentive plans for employee equity grants.<br/>
               <strong>Company Reserved Portfolio:</strong> Automatically synced with LTIP pools, tracks total shares, available shares, and locked (granted) shares.<br/>

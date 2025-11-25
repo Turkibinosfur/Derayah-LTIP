@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { formatDate, formatVestingEventId } from '../lib/dateUtils';
 import { formatShares } from '../lib/numberUtils';
@@ -56,6 +57,8 @@ interface TransferWithDetails {
 }
 
 export default function Transfers() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [transfers, setTransfers] = useState<TransferWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'pending' | 'transferred' | 'cancelled'>('all');
@@ -450,17 +453,17 @@ export default function Transfers() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+        <div className={isRTL ? 'text-right' : ''}>
+          <h1 className={`text-3xl font-bold text-gray-900 flex items-center gap-3 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
             <ArrowRightLeft className="w-8 h-8 text-blue-600" />
-            Share Transfers
+            {t('transfers.title')}
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
               {transfers.length}
             </span>
           </h1>
-          <p className="text-gray-600 mt-1">Manage and process share transfer requests</p>
+          <p className="text-gray-600 mt-1">{t('transfers.description')}</p>
         </div>
       </div>
 
@@ -471,14 +474,21 @@ export default function Transfers() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by transfer number, grant, employee..."
+              placeholder={t('transfers.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div className="flex gap-2">
-            {(['all', 'pending', 'transferred', 'cancelled'] as const).map((status) => (
+            {(['all', 'pending', 'transferred', 'cancelled'] as const).map((status) => {
+              const statusLabels: Record<typeof status, string> = {
+                all: t('transfers.all'),
+                pending: t('transfers.pending'),
+                transferred: t('transfers.transferred'),
+                cancelled: t('transfers.cancelled'),
+              };
+              return (
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
@@ -488,9 +498,10 @@ export default function Transfers() {
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                {statusLabels[status]}
               </button>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -535,7 +546,7 @@ export default function Transfers() {
                 <tr>
                   <td colSpan={9} className="px-6 py-12 text-center text-gray-500">
                     <ArrowRightLeft className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p>No transfers found</p>
+                    <p>{t('transfers.noTransfersFound')}</p>
                   </td>
                 </tr>
               ) : (
@@ -649,7 +660,7 @@ export default function Transfers() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Transfer Details</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('transfers.transferDetails')}</h2>
                   <p className="text-gray-600 mt-1">{selectedTransfer.transfer_number}</p>
                 </div>
                 <button
@@ -664,7 +675,7 @@ export default function Transfers() {
             <div className="p-6 space-y-6">
               {/* Transfer Information */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Transfer Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{t('transfers.transferInformation')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="text-sm text-gray-600">Transfer Number:</span>
@@ -703,7 +714,7 @@ export default function Transfers() {
 
               {/* Employee Information */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Employee</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{t('transfers.employee')}</h3>
                 <div className="space-y-2">
                   <div>
                     <span className="text-sm text-gray-600">Name:</span>
@@ -724,7 +735,7 @@ export default function Transfers() {
 
               {/* Portfolio Information */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Portfolio Details</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{t('transfers.portfolioDetails')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="text-sm text-gray-600">From Portfolio:</span>
@@ -746,7 +757,7 @@ export default function Transfers() {
               {/* Additional Information */}
               {selectedTransfer.notes && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Notes</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">{t('transfers.notes')}</h3>
                   <p className="text-sm text-gray-600">{selectedTransfer.notes}</p>
                 </div>
               )}
@@ -775,7 +786,7 @@ export default function Transfers() {
                   disabled={processingTransfer === selectedTransfer.id}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
                 >
-                  {processingTransfer === selectedTransfer.id ? 'Processing...' : 'Process Transfer'}
+                  {processingTransfer === selectedTransfer.id ? t('transfers.processing') : t('transfers.processTransfer')}
                 </button>
               )}
             </div>

@@ -1,16 +1,16 @@
--- Quick Fix for wajehah.sa@gmail.com Login
+-- Quick Fix for employee@example.com Login
 -- This script provides a step-by-step solution to fix the login issue
 
 -- Step 1: Check current state
 SELECT 
   '=== STEP 1: CURRENT STATE ===' as step,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') 
     THEN 'Auth user exists' 
     ELSE 'Auth user missing' 
   END as auth_status,
   CASE 
-    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'wajehah.sa@gmail.com') 
+    WHEN EXISTS (SELECT 1 FROM employees WHERE email = 'employee@example.com') 
     THEN 'Employee record exists' 
     ELSE 'Employee record missing' 
   END as employee_status,
@@ -56,22 +56,22 @@ SELECT
   email_confirmed_at,
   created_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- Step 4: If auth user doesn't exist, show instructions
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'wajehah.sa@gmail.com') THEN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'employee@example.com') THEN
     RAISE NOTICE '=== AUTH USER MISSING ===';
     RAISE NOTICE 'Please create the auth user manually:';
     RAISE NOTICE '1. Go to Supabase Dashboard > Authentication > Users';
     RAISE NOTICE '2. Click "Add user"';
-    RAISE NOTICE '3. Email: wajehah.sa@gmail.com';
+    RAISE NOTICE '3. Email: employee@example.com';
     RAISE NOTICE '4. Password: Employee123!';
     RAISE NOTICE '5. Confirm the email';
     RAISE NOTICE '6. Then run this script again.';
   ELSE
-    RAISE NOTICE 'Auth user exists for wajehah.sa@gmail.com';
+    RAISE NOTICE 'Auth user exists for employee@example.com';
   END IF;
 END;
 $$;
@@ -91,7 +91,7 @@ BEGIN
   -- Get auth user ID
   SELECT id INTO v_auth_user_id 
   FROM auth.users 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_auth_user_id IS NULL THEN
     RAISE NOTICE 'Cannot create employee record - auth user not found';
@@ -102,7 +102,7 @@ BEGIN
   -- Check if employee record exists
   SELECT id INTO v_employee_id 
   FROM employees 
-  WHERE email = 'wajehah.sa@gmail.com';
+  WHERE email = 'employee@example.com';
   
   IF v_employee_id IS NULL THEN
     -- Create employee record
@@ -123,7 +123,7 @@ BEGIN
       v_company_id,
       'Fatima',
       'Al-Zahrani',
-      'wajehah.sa@gmail.com',
+      'employee@example.com',
       v_auth_user_id,
       true,
       'wajehah.sa',
@@ -165,7 +165,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- Step 7: Final verification
@@ -184,7 +184,7 @@ SELECT
 FROM employees e
 LEFT JOIN auth.users u ON e.user_id = u.id
 LEFT JOIN companies c ON e.company_id = c.id
-WHERE e.email = 'wajehah.sa@gmail.com';
+WHERE e.email = 'employee@example.com';
 
 -- Step 8: Test if login should work
 SELECT 
@@ -194,7 +194,7 @@ SELECT
       SELECT 1 
       FROM employees e 
       WHERE e.user_id = (
-        SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+        SELECT id FROM auth.users WHERE email = 'employee@example.com'
       )
     ) 
     THEN 'SUCCESS: Login should work - employee record found' 

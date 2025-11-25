@@ -1,4 +1,4 @@
--- Diagnose wajehah.sa@gmail.com Login Issues
+-- Diagnose employee@example.com Login Issues
 -- This script checks the current state and identifies the problem
 
 -- 1. Check if auth user exists
@@ -10,7 +10,7 @@ SELECT
   created_at,
   last_sign_in_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 2. Check if employee record exists
 SELECT 
@@ -23,7 +23,7 @@ SELECT
   portal_access_enabled,
   company_id
 FROM employees 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
 -- 3. Check if company exists
 SELECT 
@@ -45,7 +45,7 @@ SELECT
   e.user_id
 FROM employees e
 WHERE e.user_id = (
-  SELECT id FROM auth.users WHERE email = 'wajehah.sa@gmail.com'
+  SELECT id FROM auth.users WHERE email = 'employee@example.com'
 );
 
 -- 5. Check RLS policies

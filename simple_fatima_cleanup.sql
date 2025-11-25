@@ -1,4 +1,4 @@
--- Simple Fatima cleanup - Ensure only Fatima Al-Zahrani exists with wajehah.sa@gmail.com
+-- Simple Fatima cleanup - Ensure only Fatima Al-Zahrani exists with employee@example.com
 -- Run this SQL directly in your Supabase SQL Editor
 
 -- First, delete any Fatima Al-Rashid records
@@ -41,7 +41,7 @@ SELECT
   (SELECT id FROM companies WHERE company_name_en = 'Derayah Financial'),
   'EMP-FATIMA-001',
   '1234567892',
-  'wajehah.sa@gmail.com',
+  'employee@example.com',
   'Fatima',
   'Al-Zahrani',
   'Data Science',
@@ -62,7 +62,7 @@ WHERE NOT EXISTS (
 
 -- Update existing Fatima Al-Zahrani to ensure correct email and portal access
 UPDATE employees
-SET email = 'wajehah.sa@gmail.com',
+SET email = 'employee@example.com',
     portal_access_enabled = true,
     portal_username = 'wajehah.sa',
     portal_password = 'WajehahSa123!'

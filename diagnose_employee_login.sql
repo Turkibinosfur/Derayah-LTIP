@@ -1,7 +1,7 @@
 -- Diagnose Employee Login Issues
 -- This script checks the current state of employee records and auth users
 
--- 1. Check if wajehah.sa@gmail.com exists in auth.users
+-- 1. Check if employee@example.com exists in auth.users
 SELECT 
   '=== AUTH USERS CHECK ===' as step,
   id,
@@ -10,9 +10,9 @@ SELECT
   created_at,
   last_sign_in_at
 FROM auth.users 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
--- 2. Check if employee record exists for wajehah.sa@gmail.com
+-- 2. Check if employee record exists for employee@example.com
 SELECT 
   '=== EMPLOYEE RECORDS CHECK ===' as step,
   id,
@@ -24,9 +24,9 @@ SELECT
   portal_username,
   company_id
 FROM employees 
-WHERE email = 'wajehah.sa@gmail.com';
+WHERE email = 'employee@example.com';
 
--- 3. Check if there are any employees with user_id linked to wajehah.sa@gmail.com
+-- 3. Check if there are any employees with user_id linked to employee@example.com
 SELECT 
   '=== EMPLOYEE BY USER_ID CHECK ===' as step,
   e.id,
@@ -37,7 +37,7 @@ SELECT
   u.email as auth_email
 FROM employees e
 JOIN auth.users u ON e.user_id = u.id
-WHERE u.email = 'wajehah.sa@gmail.com';
+WHERE u.email = 'employee@example.com';
 
 -- 4. Check all employees in the company
 SELECT 
