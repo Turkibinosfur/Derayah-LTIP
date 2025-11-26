@@ -242,6 +242,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // then check for platform super admin. Platform super admins are NOT tied to specific companies.
         // IMPORTANT: If a user is in company_super_admin_memberships BUT also has any company association,
         // they should be treated as a company-level user, not a platform super admin.
+        
+        // CRITICAL: Final safety check - ensure user is NOT in company_users before checking super admin
+        // This prevents any edge cases where company_users query might have failed
+        const { data: finalCompanyUsersCheck } = await supabase
+          .from('company_users')
+          .select('company_id, role')
+          .eq('user_id', userId)
+          .limit(1);
+
+        // If user is found in company_users at this point, treat as company admin (safety fallback)
+        if (finalCompanyUsersCheck && finalCompanyUsersCheck.length > 0) {
+          console.log('⚠️ Final check: User found in company_users - treating as company admin (not platform super admin)');
+          const companyUser = finalCompanyUsersCheck[0];
+          return {
+            user_id: userId,
+            email: user?.email || '',
+            company_id: companyUser.company_id,
+            role: companyUser.role || 'company_admin',
+            is_active: true,
+            permissions: null,
+            user_type: 'company_admin' as const  // ALWAYS company_admin if in company_users
+          };
+        }
 
         const { data: superAdminMemberships, error: superAdminError } = await supabase
           .from('company_super_admin_memberships')
@@ -255,26 +278,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Only treat as platform super admin if:
         // 1. They are in company_super_admin_memberships
-        // 2. They have NO company association (verified by checks above)
+        // 2. They have NO company association (verified by ALL checks above)
         if (superAdminMemberships && superAdminMemberships.length > 0) {
-          // Double-check: ensure user has no company association
-          // This is a safety check in case the previous queries missed something
-          const { data: finalCompanyCheck } = await supabase
+          // Final safety check: ensure user has no company association
+          // Triple-check to prevent any edge cases
+          const { data: tripleCheckCompany } = await supabase
             .from('company_users')
             .select('company_id')
             .eq('user_id', userId)
             .limit(1);
           
-          const { data: finalEmployeeCheck } = await supabase
+          const { data: tripleCheckEmployee } = await supabase
             .from('employees')
             .select('company_id')
             .eq('user_id', userId)
             .limit(1);
 
           // If user has ANY company association, they are NOT a platform super admin
-          if (finalCompanyCheck && finalCompanyCheck.length > 0) {
-            console.log('⚠️ User is in company_super_admin_memberships but also in company_users - treating as company admin');
-            const companyUser = finalCompanyCheck[0];
+          if (tripleCheckCompany && tripleCheckCompany.length > 0) {
+            console.log('⚠️ Triple-check: User is in company_super_admin_memberships but also in company_users - treating as company admin');
+            const companyUser = tripleCheckCompany[0];
             return {
               user_id: userId,
               email: user?.email || '',
@@ -286,12 +309,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             };
           }
 
-          if (finalEmployeeCheck && finalEmployeeCheck.length > 0) {
-            console.log('⚠️ User is in company_super_admin_memberships but also in employees - treating as employee');
+          if (tripleCheckEmployee && tripleCheckEmployee.length > 0) {
+            console.log('⚠️ Triple-check: User is in company_super_admin_memberships but also in employees - treating as employee');
             return {
               user_id: userId,
               email: user?.email || '',
-              company_id: finalEmployeeCheck[0].company_id,
+              company_id: tripleCheckEmployee[0].company_id,
               role: 'employee',
               is_active: true,
               permissions: null,
