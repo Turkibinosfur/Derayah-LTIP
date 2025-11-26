@@ -22,10 +22,11 @@ interface EmployeeDashboardLayoutProps {
 }
 
 export default function EmployeeDashboardLayout({ children }: EmployeeDashboardLayoutProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isRTL = i18n.language === 'ar';
   // Initialize sidebar as closed on mobile, open on desktop
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -100,12 +101,12 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed inset-y-0 ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} z-50 w-64 bg-white border-gray-200 transform transition-transform duration-200 ease-in-out ${
+        sidebarOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'
       } lg:translate-x-0`}>
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
+          <div className={`flex items-center justify-between p-6 border-b border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
               <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-2 rounded-lg">
                 <Award className="w-6 h-6 text-white" />
               </div>
@@ -135,7 +136,7 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
                       setSidebarOpen(false);
                     }
                   }}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
+                  className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'} px-4 py-3 rounded-lg transition ${
                     isActive
                       ? 'bg-blue-50 text-blue-600 font-medium'
                       : 'text-gray-700 hover:bg-gray-50'
@@ -149,8 +150,8 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
           </nav>
 
           <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3">
-              <div className="flex items-center space-x-3">
+            <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-medium">
                     {user?.email?.charAt(0).toUpperCase()}
@@ -166,7 +167,7 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center justify-center space-x-2 w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition"
+              className={`flex items-center justify-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'} w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition`}
             >
               <LogOut className="w-4 h-4" />
               <span>{t('employee.signOut')}</span>
@@ -175,23 +176,23 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
         </div>
       </div>
 
-      <div className="lg:pl-64">
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-2 sm:gap-x-4 border-b border-gray-200 bg-white px-2 sm:px-4 shadow-sm sm:px-6 lg:px-8">
+      <div className={isRTL ? 'lg:pr-64' : 'lg:pl-64'}>
+        <div className={`sticky top-0 z-40 flex h-16 shrink-0 items-center ${isRTL ? 'gap-x-reverse gap-x-2 sm:gap-x-4' : 'gap-x-2 sm:gap-x-4'} border-b border-gray-200 bg-white px-2 sm:px-4 shadow-sm sm:px-6 lg:px-8`}>
           <button
             type="button"
-            className="-m-2.5 p-2.5 text-gray-700 lg:hidden flex-shrink-0"
+            className={`-m-2.5 p-2.5 text-gray-700 lg:hidden flex-shrink-0 ${isRTL ? 'ml-auto' : ''}`}
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
             <Menu className="h-6 w-6" />
           </button>
 
-          <div className="flex flex-1 gap-x-2 sm:gap-x-4 self-stretch lg:gap-x-6 items-center justify-end min-w-0">
-            <div className="flex items-center gap-x-2 sm:gap-x-4 lg:gap-x-6">
+          <div className={`flex flex-1 ${isRTL ? 'gap-x-reverse gap-x-2 sm:gap-x-4 lg:gap-x-6' : 'gap-x-2 sm:gap-x-4 lg:gap-x-6'} self-stretch items-center ${isRTL ? 'justify-start' : 'justify-end'} min-w-0`}>
+            <div className={`flex items-center ${isRTL ? 'gap-x-reverse gap-x-2 sm:gap-x-4 lg:gap-x-6' : 'gap-x-2 sm:gap-x-4 lg:gap-x-6'}`}>
               <LanguageSwitcher />
               <Link
                 to="/login"
-                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-200 rounded-lg transition flex-shrink-0"
+                className={`flex items-center ${isRTL ? 'space-x-reverse space-x-1 sm:space-x-2' : 'space-x-1 sm:space-x-2'} px-2 sm:px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-200 rounded-lg transition flex-shrink-0`}
                 title="Switch to Admin Portal"
               >
                 <ArrowRightLeft className="w-4 h-4 flex-shrink-0" />
@@ -203,7 +204,7 @@ export default function EmployeeDashboardLayout({ children }: EmployeeDashboardL
               >
                 <span className="sr-only">View notifications</span>
                 <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
-                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                <span className={`absolute top-1 ${isRTL ? 'left-1' : 'right-1'} block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white`} />
               </Link>
             </div>
           </div>

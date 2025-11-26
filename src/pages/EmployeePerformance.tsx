@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import PerformanceChart from '../components/PerformanceChart';
 
 export default function EmployeePerformance() {
+  const { t } = useTranslation();
   const [vestedShares, setVestedShares] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -47,8 +49,8 @@ export default function EmployeePerformance() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Performance History</h1>
-        <p className="text-gray-600 mt-1">Track your portfolio value over time</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('employeePerformance.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('employeePerformance.description')}</p>
       </div>
       <PerformanceChart currentPrice={85.50} vestedShares={vestedShares} />
     </div>

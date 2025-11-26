@@ -487,7 +487,7 @@ This agreement is subject to the terms and conditions of the company's equity in
       <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading your dashboard...</p>
+          <p className="text-gray-500 mt-4">{t('employeeDashboard.loadingDashboard')}</p>
         </div>
       </div>
     );
@@ -575,21 +575,21 @@ This agreement is subject to the terms and conditions of the company's equity in
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
-          <p className="text-blue-100 mb-2">Total Shares Granted</p>
+          <p className="text-blue-100 mb-2">{t('employeeDashboard.totalSharesGranted')}</p>
           <p className="text-4xl font-bold">{displayGrantData.total_shares.toLocaleString()}</p>
-          <p className="text-blue-200 text-sm mt-2">{displayGrantData.grants.length} {displayGrantData.grants.length === 1 ? 'Grant' : 'Grants'}</p>
+          <p className="text-blue-200 text-sm mt-2">{displayGrantData.grants.length} {displayGrantData.grants.length === 1 ? t('employeeDashboard.grant') : t('employeeDashboard.grants')}</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl shadow-lg p-6 text-white">
-          <p className="text-green-100 mb-2">Vested Shares</p>
+          <p className="text-green-100 mb-2">{t('employeeDashboard.vestedShares')}</p>
           <p className="text-4xl font-bold">{displayGrantData.vested_shares.toLocaleString()}</p>
-          <p className="text-green-200 text-sm mt-2">{displayGrantData.total_shares > 0 ? ((displayGrantData.vested_shares / displayGrantData.total_shares) * 100).toFixed(1) : '0'}% of total</p>
+          <p className="text-green-200 text-sm mt-2">{displayGrantData.total_shares > 0 ? ((displayGrantData.vested_shares / displayGrantData.total_shares) * 100).toFixed(1) : '0'}% {t('employeeDashboard.ofTotal')}</p>
         </div>
 
         <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl shadow-lg p-6 text-white">
-          <p className="text-purple-100 mb-2">Unvested Shares</p>
+          <p className="text-purple-100 mb-2">{t('employeeDashboard.unvestedShares')}</p>
           <p className="text-4xl font-bold">{displayGrantData.remaining_unvested_shares.toLocaleString()}</p>
-          <p className="text-purple-200 text-sm mt-2">{displayGrantData.total_shares > 0 ? ((displayGrantData.remaining_unvested_shares / displayGrantData.total_shares) * 100).toFixed(1) : '0'}% remaining</p>
+          <p className="text-purple-200 text-sm mt-2">{displayGrantData.total_shares > 0 ? ((displayGrantData.remaining_unvested_shares / displayGrantData.total_shares) * 100).toFixed(1) : '0'}% {t('employeeDashboard.remaining')}</p>
         </div>
       </div>
 
@@ -806,7 +806,7 @@ This agreement is subject to the terms and conditions of the company's equity in
                     <div className="text-3xl font-bold text-green-600 mb-1">
                       {displayGrantData.vested_shares.toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500">options</div>
+                    <div className="text-sm text-gray-500">{t('employeeDashboard.options')}</div>
                     <div className="text-xs text-gray-400 mt-1">{t('employeeDashboard.cumulativeVestedOptions')}</div>
                   </div>
                 </>
@@ -836,9 +836,9 @@ This agreement is subject to the terms and conditions of the company's equity in
             <div className="text-xs text-gray-500 mt-2">
               {displayGrantData.roadmapData && displayGrantData.roadmapData.length > 0 ? (
                 <>
-                  Total: {displayGrantData.roadmapData.reduce((sum: number, item: any) => 
+                  {t('employeeDashboard.total')}: {displayGrantData.roadmapData.reduce((sum: number, item: any) => 
                     sum + (item.vestedShares || 0) + (item.unvestedShares || 0), 0
-                  ).toLocaleString()} shares
+                  ).toLocaleString()} {t('employeeDashboard.shares')}
                 </>
               ) : (
                 t('employeeDashboard.noDataAvailable')
@@ -890,7 +890,7 @@ This agreement is subject to the terms and conditions of the company's equity in
                             </>
                           )}
                           {totalValuation === 0 && (
-                            <div className="text-gray-400">No shares in this period</div>
+                            <div className="text-gray-400">{t('employeeDashboard.noDataAvailable')}</div>
                           )}
                         </div>
                         
@@ -949,23 +949,23 @@ This agreement is subject to the terms and conditions of the company's equity in
                   <div className="flex items-center justify-center space-x-4 text-xs text-gray-600 mb-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 rounded bg-green-600"></div>
-                      <span>Vested Shares (SAR)</span>
+                      <span>{t('employeeDashboard.vestedSharesSAR')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 rounded bg-purple-600"></div>
-                      <span>Unvested Shares (SAR)</span>
+                      <span>{t('employeeDashboard.unvestedSharesSAR')}</span>
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 text-center space-y-1">
-                    <p><strong>Vested includes:</strong> vested, transferred, exercised, due, and past-dated events</p>
-                    <p><strong>Unvested includes:</strong> pending and future-dated events</p>
+                    <p><strong>{t('employeeDashboard.vestedIncludes')}</strong></p>
+                    <p><strong>{t('employeeDashboard.unvestedIncludes')}</strong></p>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <TrendingUp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No roadmap data available</p>
+                <p className="text-sm">{t('employeeDashboard.noRoadmapDataAvailable')}</p>
               </div>
             )}
           </div>
@@ -981,7 +981,7 @@ This agreement is subject to the terms and conditions of the company's equity in
             </div>
             <h3 className="text-xl font-bold text-yellow-800">{t('employeeDashboard.actionRequired')}</h3>
           </div>
-          <p className="text-yellow-700 mb-4">You have grants that require your signature. Please review and accept the contracts to activate your equity grants.</p>
+          <p className="text-yellow-700 mb-4">{t('employeeDashboard.actionRequiredMessage')}</p>
           <div className="space-y-3">
             {pendingSignatureGrants.map((grant: any) => (
                 <div key={grant.id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-yellow-300">
@@ -992,20 +992,20 @@ This agreement is subject to the terms and conditions of the company's equity in
                     <div>
                       <p className="font-semibold text-gray-900">{grant.grant_number}</p>
                       <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Pending Signature
+                        {t('employeeDashboard.pendingSignature')}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="text-right">
                       <p className="text-lg font-bold text-gray-900">{Number(grant.total_shares).toLocaleString()}</p>
-                      <p className="text-sm text-gray-600">shares</p>
+                      <p className="text-sm text-gray-600">{t('employeeDashboard.shares')}</p>
                     </div>
                     <button 
                       onClick={() => handleReviewContract(grant)}
                       className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-medium"
                     >
-                      Review Contract
+                      {t('employeeDashboard.reviewContract')}
                     </button>
                   </div>
                 </div>
@@ -1019,10 +1019,10 @@ This agreement is subject to the terms and conditions of the company's equity in
           <div>
             <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-600" />
-              Your Vesting Calendar
+              {t('employeeDashboard.yourVestingCalendar')}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
-              Track upcoming vesting milestones and review past events.
+              {t('employeeDashboard.trackUpcomingVesting')}
             </p>
           </div>
         </div>
@@ -1038,7 +1038,7 @@ This agreement is subject to the terms and conditions of the company's equity in
         ) : (
           <div className="py-12 text-center text-gray-500 border border-dashed border-gray-200 rounded-lg">
             <Clock className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-            <p className="text-sm">No vesting events scheduled yet. Your future vesting milestones will appear here.</p>
+            <p className="text-sm">{t('employeeDashboard.noVestingEventsScheduled')}</p>
           </div>
         )}
       </div>
@@ -1078,7 +1078,7 @@ This agreement is subject to the terms and conditions of the company's equity in
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-900">{Number(grant.total_shares).toLocaleString()}</p>
-                    <p className="text-sm text-gray-600">shares</p>
+                    <p className="text-sm text-gray-600">{t('employeeDashboard.shares')}</p>
                   </div>
                 </div>
               );
@@ -1088,7 +1088,7 @@ This agreement is subject to the terms and conditions of the company's equity in
           <div className="text-center py-8">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h4 className="text-lg font-semibold text-gray-900 mb-2">{t('employeeDashboard.noActiveGrants')}</h4>
-            <p className="text-gray-600">You don't have any active equity grants at this time.</p>
+            <p className="text-gray-600">{t('employeeDashboard.noActiveGrantsMessage')}</p>
           </div>
         )}
       </div>
@@ -1150,11 +1150,11 @@ This agreement is subject to the terms and conditions of the company's equity in
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  <p className="font-medium">By accepting this agreement, you acknowledge:</p>
+                  <p className="font-medium">{t('employeeDashboard.byAcceptingAgreement')}</p>
                   <ul className="mt-2 space-y-1">
-                    <li>• Understanding of the grant terms and vesting schedule</li>
-                    <li>• Acceptance of company equity plan conditions</li>
-                    <li>• Agreement to tax implications and restrictions</li>
+                    <li>• {t('employeeDashboard.understandingGrantTerms')}</li>
+                    <li>• {t('employeeDashboard.acceptanceOfConditions')}</li>
+                    <li>• {t('employeeDashboard.agreementToTaxImplications')}</li>
                   </ul>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -1162,13 +1162,13 @@ This agreement is subject to the terms and conditions of the company's equity in
                     onClick={() => setShowContractModal(false)}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     onClick={handleAcceptContract}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
                   >
-                    Accept Agreement
+                    {t('employeeDashboard.acceptAgreement')}
                   </button>
                 </div>
               </div>
@@ -1207,7 +1207,7 @@ This agreement is subject to the terms and conditions of the company's equity in
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <span className="text-xs uppercase tracking-wide text-gray-500">Plan</span>
+                  <span className="text-xs uppercase tracking-wide text-gray-500">{t('employeeDashboard.plan')}</span>
                   <p className="text-base font-semibold text-gray-900">
                     {selectedVestingEvent.plan_name}
                   </p>
@@ -1218,7 +1218,7 @@ This agreement is subject to the terms and conditions of the company's equity in
                 <div>
                   <span className="text-xs uppercase tracking-wide text-gray-500">{t('employeeDashboard.sharesToVest')}</span>
                   <p className="text-base font-semibold text-gray-900">
-                    {Math.floor(Number(selectedVestingEvent.shares_to_vest || 0)).toLocaleString()} shares
+                    {Math.floor(Number(selectedVestingEvent.shares_to_vest || 0)).toLocaleString()} {t('employeeDashboard.shares')}
                   </p>
                 </div>
                 <div>
@@ -1238,7 +1238,7 @@ This agreement is subject to the terms and conditions of the company's equity in
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
                 <div>
-                  <span className="text-xs uppercase tracking-wide text-gray-500">Grant</span>
+                  <span className="text-xs uppercase tracking-wide text-gray-500">{t('employeeDashboard.grant')}</span>
                   <p className="text-sm font-medium text-gray-900">{selectedVestingEvent.grants?.grant_number || '—'}</p>
                 </div>
                 <div>
@@ -1257,15 +1257,15 @@ This agreement is subject to the terms and conditions of the company's equity in
             </div>
 
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end">
-              <button
-                onClick={() => {
-                  setShowVestingEventModal(false);
-                  setSelectedVestingEvent(null);
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Close
-              </button>
+                <button
+                  onClick={() => {
+                    setShowVestingEventModal(false);
+                    setSelectedVestingEvent(null);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  {t('employeeDashboard.close')}
+                </button>
             </div>
           </div>
         </div>

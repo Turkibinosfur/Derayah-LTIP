@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import TaxCalculator from '../components/TaxCalculator';
 
 export default function EmployeeTaxCalculator() {
+  const { t } = useTranslation();
   const [grantData, setGrantData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,14 +52,14 @@ export default function EmployeeTaxCalculator() {
   }
 
   if (!grantData) {
-    return <div className="text-center py-12"><p className="text-gray-600">No grant data available</p></div>;
+    return <div className="text-center py-12"><p className="text-gray-600">{t('employeeTaxCalculator.noGrantData')}</p></div>;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Tax Calculator</h1>
-        <p className="text-gray-600 mt-1">Estimate your tax liability on vested shares</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('employeeTaxCalculator.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('employeeTaxCalculator.description')}</p>
       </div>
       <TaxCalculator
         vestedShares={grantData.vested_shares}

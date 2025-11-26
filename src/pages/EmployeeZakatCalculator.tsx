@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import ZakatCalculator from '../components/ZakatCalculator';
 
 export default function EmployeeZakatCalculator() {
+  const { t } = useTranslation();
   const [vestedShares, setVestedShares] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -47,8 +49,8 @@ export default function EmployeeZakatCalculator() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Zakat Calculator</h1>
-        <p className="text-gray-600 mt-1">Calculate your Islamic wealth tax</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('employeeZakatCalculator.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('employeeZakatCalculator.description')}</p>
       </div>
       <ZakatCalculator vestedShares={vestedShares} currentPrice={85.50} />
     </div>

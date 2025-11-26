@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { Briefcase, DollarSign, TrendingUp, Package, ArrowRightLeft, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { formatDate } from '../lib/dateUtils';
@@ -48,6 +49,7 @@ interface TransferData {
 }
 
 export default function EmployeePortfolio() {
+  const { t } = useTranslation();
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [grants, setGrants] = useState<GrantData[]>([]);
   const [transfers, setTransfers] = useState<TransferData[]>([]);
@@ -184,7 +186,7 @@ export default function EmployeePortfolio() {
       <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading your portfolio...</p>
+          <p className="text-gray-500 mt-4">{t('employeePortfolio.loading')}</p>
         </div>
       </div>
     );
@@ -194,9 +196,9 @@ export default function EmployeePortfolio() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Portfolio</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t('employeePortfolio.title')}</h1>
         <p className="text-gray-600 mt-1">
-          View your equity portfolio and transaction history
+          {t('employeePortfolio.description')}
         </p>
       </div>
 
@@ -206,7 +208,7 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Shares</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.totalShares')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {totalShares.toLocaleString()}
               </p>
@@ -219,7 +221,7 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Available Shares</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.availableShares')}</p>
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {availableShares.toLocaleString()}
               </p>
@@ -232,7 +234,7 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Locked Shares</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.lockedShares')}</p>
               <p className="text-2xl font-bold text-amber-600 mt-1">
                 {lockedShares.toLocaleString()}
               </p>
@@ -245,12 +247,12 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Portfolio Value</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.portfolioValue')}</p>
               <p className="text-2xl font-bold text-purple-600 mt-1">
                 SAR {portfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                @ SAR {sharePrice.toFixed(2)} per share
+                @ SAR {sharePrice.toFixed(2)} {t('employeePortfolio.perShare')}
               </p>
             </div>
             <DollarSign className="w-8 h-8 text-purple-600" />
@@ -263,30 +265,30 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Briefcase className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Portfolio Details</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('employeePortfolio.portfolioDetails')}</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Portfolio Number</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.portfolioNumber')}</p>
               <p className="text-lg font-semibold text-gray-900 mt-1">
                 {portfolio.portfolio_number}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Company</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.company')}</p>
               <p className="text-lg font-semibold text-gray-900 mt-1">
                 {companyInfo?.company_name_en || 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Created Date</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.createdDate')}</p>
               <p className="text-lg font-semibold text-gray-900 mt-1">
                 {formatDate(portfolio.created_at)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Last Updated</p>
+              <p className="text-sm text-gray-500">{t('employeePortfolio.lastUpdated')}</p>
               <p className="text-lg font-semibold text-gray-900 mt-1">
                 {formatDate(portfolio.updated_at)}
               </p>
@@ -298,9 +300,9 @@ export default function EmployeePortfolio() {
           <div className="flex items-center space-x-3">
             <Clock className="w-6 h-6 text-yellow-600" />
             <div>
-              <h3 className="text-lg font-semibold text-yellow-900">No Portfolio Found</h3>
+              <h3 className="text-lg font-semibold text-yellow-900">{t('employeePortfolio.noPortfolioFound')}</h3>
               <p className="text-sm text-yellow-700 mt-1">
-                Your portfolio will be created automatically when shares are transferred to you.
+                {t('employeePortfolio.noPortfolioMessage')}
               </p>
             </div>
           </div>
@@ -310,7 +312,7 @@ export default function EmployeePortfolio() {
       {/* Portfolio Valuation Chart */}
       {portfolio && tadawulSymbol && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Portfolio Valuation</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('employeePortfolio.portfolioValuation')}</h2>
           <PortfolioValuation
             tadawulSymbol={tadawulSymbol}
             vestedShares={totalVestedFromGrants}
@@ -324,7 +326,7 @@ export default function EmployeePortfolio() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <div className="flex items-center space-x-3 mb-4">
             <TrendingUp className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Grants Breakdown</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('employeePortfolio.grantsBreakdown')}</h2>
           </div>
           
           <div className="overflow-x-auto">
@@ -332,22 +334,22 @@ export default function EmployeePortfolio() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grant Number
+                    {t('employeePortfolio.grantNumber')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Plan
+                    {t('employeePortfolio.plan')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Shares
+                    {t('employeePortfolio.totalShares')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Vested
+                    {t('employeePortfolio.vested')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Unvested
+                    {t('employeePortfolio.unvested')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grant Date
+                    {t('employeePortfolio.grantDate')}
                   </th>
                 </tr>
               </thead>
@@ -391,7 +393,7 @@ export default function EmployeePortfolio() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center space-x-3 mb-4">
           <ArrowRightLeft className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-bold text-gray-900">Transaction History</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('employeePortfolio.transactionHistory')}</h2>
         </div>
         
         {transfers.length > 0 ? (
@@ -400,19 +402,19 @@ export default function EmployeePortfolio() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Transfer Number
+                    {t('employeePortfolio.transferNumber')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grant
+                    {t('employeePortfolio.grant')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Shares
+                    {t('employeePortfolio.shares')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                    {t('employeePortfolio.date')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t('employeePortfolio.status')}
                   </th>
                 </tr>
               </thead>
@@ -455,8 +457,8 @@ export default function EmployeePortfolio() {
         ) : (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>No transactions yet</p>
-            <p className="text-sm mt-1">Your transfer history will appear here once shares are transferred to your portfolio.</p>
+            <p>{t('employeePortfolio.noTransactions')}</p>
+            <p className="text-sm mt-1">{t('employeePortfolio.noTransactionsMessage')}</p>
           </div>
         )}
       </div>

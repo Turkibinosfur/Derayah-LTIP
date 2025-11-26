@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { getBatchGrantVestingDetails } from '../lib/vestingUtils';
 import InteractiveVestingTimeline from '../components/InteractiveVestingTimeline';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function EmployeeVesting() {
+  const { t } = useTranslation();
   const [grants, setGrants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedGrants, setExpandedGrants] = useState<Set<string>>(new Set());
@@ -88,19 +90,19 @@ export default function EmployeeVesting() {
   }
 
   if (!grants || grants.length === 0) {
-    return <div className="text-center py-12"><p className="text-gray-600">No vesting data available</p></div>;
+    return <div className="text-center py-12"><p className="text-gray-600">{t('employeeVesting.noVestingData')}</p></div>;
   }
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          Vesting Timeline
+          {t('employeeVesting.title')}
           <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white text-lg font-semibold">
             {grants.length}
           </span>
         </h1>
-        <p className="text-gray-600 mt-1">Track your share vesting progression across all grants</p>
+        <p className="text-gray-600 mt-1">{t('employeeVesting.description')}</p>
       </div>
 
       {grants.map((grant) => (
@@ -109,18 +111,18 @@ export default function EmployeeVesting() {
             <h2 className="text-xl font-semibold text-gray-900">{grant.grant_number}</h2>
             <div className="flex items-center space-x-4 mt-2 flex-wrap gap-2">
               <span className="text-sm text-gray-600">
-                <span className="font-medium">{Number(grant.total_shares).toLocaleString()}</span> shares
+                <span className="font-medium">{Number(grant.total_shares).toLocaleString()}</span> {t('employeeVesting.shares')}
               </span>
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                 grant.status === 'active'
                   ? 'bg-green-100 text-green-800'
                   : 'bg-yellow-100 text-yellow-800'
               }`}>
-                {grant.status === 'active' ? 'Active' : 'Pending Signature'}
+                {grant.status === 'active' ? t('employeeVesting.active') : t('employeeVesting.pendingSignature')}
               </span>
               {grant.incentive_plans && (
                 <span className="text-sm text-gray-600">
-                  Plan: <span className="font-medium">{grant.incentive_plans.plan_name_en}</span>
+                  {t('employeeVesting.plan')}: <span className="font-medium">{grant.incentive_plans.plan_name_en}</span>
                 </span>
               )}
               {/* Contract Status */}
@@ -129,7 +131,7 @@ export default function EmployeeVesting() {
                 if (grant.employee_acceptance_at) {
                   return (
                     <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Contract Signed
+                      {t('employeeVesting.contractSigned')}
                     </span>
                   );
                 }
@@ -146,14 +148,14 @@ export default function EmployeeVesting() {
                     'draft': 'bg-gray-100 text-gray-600'
                   };
                   const statusLabels: Record<string, string> = {
-                    'signed': 'Contract Signed',
-                    'executed': 'Contract Executed',
-                    'pending_signature': 'Pending Signature',
-                    'draft': 'Draft Contract'
+                    'signed': t('employeeVesting.contractSigned'),
+                    'executed': t('employeeVesting.contractExecuted'),
+                    'pending_signature': t('employeeVesting.pendingSignature'),
+                    'draft': t('employeeVesting.draftContract')
                   };
                   return (
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[docStatus] || 'bg-gray-100 text-gray-600'}`}>
-                      {statusLabels[docStatus] || 'Contract'}
+                      {statusLabels[docStatus] || t('employeeVesting.contract')}
                     </span>
                   );
                 }
@@ -165,20 +167,20 @@ export default function EmployeeVesting() {
             {grant.vestingDetails && (
               <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">Cliff Period:</span>
-                  <span className="ml-1 font-medium">{grant.vestingDetails.cliffMonths} months</span>
+                  <span className="text-gray-600">{t('employeeVesting.cliffPeriod')}:</span>
+                  <span className="ml-1 font-medium">{grant.vestingDetails.cliffMonths} {t('employeeVesting.months')}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Frequency:</span>
+                  <span className="text-gray-600">{t('employeeVesting.frequency')}:</span>
                   <span className="ml-1 font-medium capitalize">{grant.vestingDetails.vestingFrequency}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Type:</span>
+                  <span className="text-gray-600">{t('employeeVesting.type')}:</span>
                   <span className="ml-1 font-medium capitalize">{grant.vestingDetails.vestingType.replace('_', ' ')}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Duration:</span>
-                  <span className="ml-1 font-medium">{grant.vestingDetails.vestingYears} years</span>
+                  <span className="text-gray-600">{t('employeeVesting.duration')}:</span>
+                  <span className="ml-1 font-medium">{grant.vestingDetails.vestingYears} {t('employeeVesting.years')}</span>
                 </div>
               </div>
             )}
@@ -199,7 +201,7 @@ export default function EmployeeVesting() {
                 }}
                 className="flex items-center justify-between w-full text-left p-4 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg transition-all duration-200 cursor-pointer"
               >
-                <h3 className="text-lg font-medium text-gray-900">Vesting Schedule</h3>
+                <h3 className="text-lg font-medium text-gray-900">{t('employeeVesting.vestingSchedule')}</h3>
                 {expandedGrants.has(grant.id) ? (
                   <ChevronUp className="w-5 h-5 text-gray-500" />
                 ) : (
@@ -221,12 +223,12 @@ export default function EmployeeVesting() {
                           })()}
                         </p>
                         <p className="text-sm text-gray-600">
-                          Vesting Event #{record.sequence_number}
+                          {t('employeeVesting.vestingEvent')} #{record.sequence_number}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-gray-900">
-                          {Number(record.shares_to_vest).toLocaleString()} shares
+                          {Number(record.shares_to_vest).toLocaleString()} {t('employeeVesting.shares')}
                         </p>
                         <p className="text-sm text-gray-600">
                           {((record.shares_to_vest / grant.total_shares) * 100).toFixed(1)}%
@@ -251,7 +253,7 @@ export default function EmployeeVesting() {
           ) : (
             <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-yellow-800 text-sm">
-                No individual vesting records found. This grant may not have been processed with a vesting schedule template.
+                {t('employeeVesting.noIndividualRecords')}
               </p>
             </div>
           )}
@@ -259,7 +261,7 @@ export default function EmployeeVesting() {
           {/* Progress Bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Vesting Progress</span>
+              <span className="text-sm font-medium text-gray-700">{t('employeeVesting.vestingProgress')}</span>
               <span className="text-sm text-gray-600">
                 {(() => {
                   const vestedShares = Number(grant.vested_shares || 0);
@@ -271,7 +273,7 @@ export default function EmployeeVesting() {
                     return sum;
                   }, 0);
                   const totalVestedIncludingDue = vestedShares + dueShares;
-                  return `${totalVestedIncludingDue.toLocaleString()} / ${Number(grant.total_shares).toLocaleString()} shares`;
+                  return `${totalVestedIncludingDue.toLocaleString()} / ${Number(grant.total_shares).toLocaleString()} ${t('employeeVesting.shares')}`;
                 })()}
               </span>
             </div>
@@ -309,7 +311,7 @@ export default function EmployeeVesting() {
                 }, 0);
                 const totalVestedIncludingDue = vestedShares + dueShares;
                 const percentage = totalShares > 0 ? (totalVestedIncludingDue / totalShares) * 100 : 0;
-                return `${percentage.toFixed(1)}% vested`;
+                return `${percentage.toFixed(1)}% ${t('employeeVesting.vested')}`;
               })()}
             </div>
           </div>
