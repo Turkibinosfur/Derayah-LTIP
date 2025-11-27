@@ -303,12 +303,6 @@ export default function Dashboard() {
         // Fallback to grantedSharesFromGrants if plans data is not available
         const grantedShares = grantedFromPlans > 0 ? grantedFromPlans : 0;
 
-        console.log('📊 Shares Breakdown Debug:', {
-          totalGrants: allGrantsRes.data?.length || 0,
-          ltipTotalAllocated,
-          grantedShares,
-        });
-
         const ltipTotalAllocated = ltipPoolsRes.data?.reduce(
           (sum, pool) => sum + Number(pool.total_shares_allocated || 0),
           0
@@ -318,6 +312,12 @@ export default function Dashboard() {
           (sum, pool) => sum + Number(pool.shares_used || 0),
           0
         ) || 0;
+
+        console.log('📊 Shares Breakdown Debug:', {
+          totalGrants: allGrantsRes.data?.length || 0,
+          ltipTotalAllocated,
+          grantedShares,
+        });
 
         const ungrantedShares = Math.max(0, ltipTotalAllocated - grantedShares);
 
