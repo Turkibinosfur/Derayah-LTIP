@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
@@ -587,7 +587,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return Boolean(userRole?.permissions && userRole.permissions[permissionKey]);
   };
 
-  const getCurrentCompanyId = () => {
+  const getCurrentCompanyId = useCallback(() => {
     if (userRole?.role === 'super_admin') {
       return activeCompany.id;
     }
@@ -595,7 +595,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return userRole.company_id;
     }
     return null;
-  };
+  }, [userRole?.role, userRole?.company_id, activeCompany.id]);
 
   const setActiveCompany = (companyId: string | null, companyName?: string | null) => {
     setActiveCompanyState({ id: companyId, name: companyName ?? null });

@@ -36,7 +36,7 @@ interface CompanyStats {
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const { getCurrentCompanyId, userRole, isSuperAdmin } = useAuth();
+  const { getCurrentCompanyId, userRole, isSuperAdmin, activeCompanyId } = useAuth();
   const { brandColor, getBgColor } = useCompanyColor();
   const [stats, setStats] = useState<CompanyStats>({
     totalEmployees: 0,
@@ -72,9 +72,24 @@ export default function Dashboard() {
   });
   const [roadmapData, setRoadmapData] = useState<any[]>([]);
 
-  const currentCompanyId = getCurrentCompanyId();
+  // Use activeCompanyId directly to avoid function calls in dependencies
+  const currentCompanyId = activeCompanyId || getCurrentCompanyId();
   const isLoadingRef = useRef(false);
   const lastLoadedCompanyIdRef = useRef<string | null>(null);
+
+  // Reset refs and state when user changes (e.g., switching from admin to super admin)
+  useEffect(() => {
+    // Reset refs when user ID changes (user logged out and different user logged in)
+    lastLoadedCompanyIdRef.current = null;
+    isLoadingRef.current = false;
+    setCompanyInfo(null);
+    setLoading(true);
+    // Clear all dashboard state
+    setUpcomingVestingEvents([]);
+    setDueVestingEvents([]);
+    setCalendarVestingEvents([]);
+    setRoadmapData([]);
+  }, [userRole?.user_id]); // Reset when user ID changes
 
   // Memoize loadDashboardData to prevent unnecessary re-creations
   const loadDashboardData = useCallback(async () => {
@@ -472,7 +487,7 @@ export default function Dashboard() {
     } finally {
       isLoadingRef.current = false;
     }
-  }, [getCurrentCompanyId, isSuperAdmin]); // Removed companyInfo to prevent infinite loop
+  }, [activeCompanyId, userRole?.user_id, isSuperAdmin]); // Use activeCompanyId and user_id instead of getCurrentCompanyId
 
   useEffect(() => {
     // Only load if we have a company ID and haven't loaded yet
