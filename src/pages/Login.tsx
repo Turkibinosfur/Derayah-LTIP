@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Building2, Lock, Mail } from 'lucide-react';
 import { usePlatformLogo } from '../hooks/usePlatformLogo';
@@ -15,24 +15,39 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const { signIn, signUp, user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasRedirectedRef = useRef(false);
 
   // Redirect already authenticated users - wait for userRole to be loaded
   useEffect(() => {
-    if (!authLoading && user) {
-      // Wait for userRole to be determined before redirecting
-      if (userRole) {
-        if (userRole.user_type === 'employee') {
-          navigate('/employee/dashboard', { replace: true });
-        } else if (userRole.user_type === 'super_admin') {
-          navigate('/operator/companies', { replace: true });
-        } else {
-          navigate('/dashboard', { replace: true });
-        }
-      }
-      // If userRole is null but we have a user, wait a bit more for it to load
-      // Don't redirect if still loading
+    // Only redirect if we're still on the login page and haven't redirected yet
+    if (location.pathname !== '/login' && location.pathname !== '/Derayah-LTIP/login') {
+      hasRedirectedRef.current = false;
+      return;
     }
-  }, [user, userRole, authLoading, navigate]);
+
+    // Prevent multiple redirects
+    if (hasRedirectedRef.current) return;
+
+    if (!authLoading && user && userRole) {
+      hasRedirectedRef.current = true;
+      
+      if (userRole.user_type === 'employee') {
+        navigate('/employee/dashboard', { replace: true });
+      } else if (userRole.user_type === 'super_admin') {
+        navigate('/operator/companies', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [user, userRole, authLoading, navigate, location.pathname]);
+
+  // Reset redirect flag when user logs out
+  useEffect(() => {
+    if (!user) {
+      hasRedirectedRef.current = false;
+    }
+  }, [user]);
 
   const handleQuickLogin = async (quickEmail: string, quickPassword: string) => {
     setIsSignUp(false);

@@ -216,7 +216,7 @@ export default function EmployeeOverview() {
         if (grant.status === 'pending_signature') {
           taskList.push({
             id: grant.id,
-            title: `Accept Grant Agreement: ${grant.grant_number}`,
+            title: `${t('employeeOverview.acceptGrantAgreement', 'Accept Grant Agreement')}: ${grant.grant_number}`,
             date: grant.grant_date || new Date().toISOString(),
             type: 'grant',
             status: 'pending_signature',
@@ -250,7 +250,7 @@ export default function EmployeeOverview() {
         pendingDocuments.forEach((doc: any) => {
           taskList.push({
             id: doc.id,
-            title: `Sign Contract: ${doc.document_name || doc.document_type || 'Grant Agreement'}`,
+            title: `${t('employeeOverview.signContract', 'Sign Contract')}: ${doc.document_name || doc.document_type || t('employeeOverview.grantAgreement', 'Grant Agreement')}`,
             date: doc.generated_at || new Date().toISOString(),
             type: 'document',
             status: doc.status || 'pending_signature',
@@ -465,7 +465,7 @@ export default function EmployeeOverview() {
     }>();
 
     portfolioData.grants.forEach((grant: any) => {
-      const planName = grant.incentive_plans?.plan_name_en || 'Unnamed Plan';
+      const planName = grant.incentive_plans?.plan_name_en || t('employeeOverview.unnamedPlan', 'Unnamed Plan');
       const planType = grant.incentive_plans?.plan_type || '';
       
       if (!planMap.has(planName)) {
@@ -505,15 +505,15 @@ export default function EmployeeOverview() {
     if (absNum >= 1000000000) {
       // Use Math.floor to get lower value, then format with 1 decimal
       const value = Math.floor(num / 100000) / 10;
-      return value.toFixed(1) + 'B';
+      return value.toFixed(1) + t('employeeOverview.billions');
     } else if (absNum >= 1000000) {
       // Use Math.floor to get lower value, then format with 1 decimal
       const value = Math.floor(num / 100000) / 10;
-      return value.toFixed(1) + 'M';
+      return value.toFixed(1) + t('employeeOverview.millions');
     } else if (absNum >= 1000) {
       // Use Math.floor to get lower value, then format with 1 decimal
       const value = Math.floor(num / 100) / 10;
-      return value.toFixed(1) + 'K';
+      return value.toFixed(1) + t('employeeOverview.thousands');
     } else {
       return Math.floor(num).toString();
     }
@@ -526,15 +526,15 @@ export default function EmployeeOverview() {
     if (absNum >= 1000000000) {
       // For billions: round down to 2 decimals
       const value = Math.floor((num / 1000000000) * 100) / 100;
-      return value.toFixed(2) + 'B';
+      return value.toFixed(2) + t('employeeOverview.billions');
     } else if (absNum >= 1000000) {
       // For millions: round down to 2 decimals
       const value = Math.floor((num / 1000000) * 100) / 100;
-      return value.toFixed(2) + 'M';
+      return value.toFixed(2) + t('employeeOverview.millions');
     } else if (absNum >= 1000) {
       // For thousands: round down to 2 decimals
       const value = Math.floor((num / 1000) * 100) / 100;
-      return value.toFixed(2) + 'K';
+      return value.toFixed(2) + t('employeeOverview.thousands');
     } else {
       // For values less than 1000, show with 2 decimals
       const value = Math.floor(num * 100) / 100;
@@ -699,7 +699,7 @@ export default function EmployeeOverview() {
     if (total === 0) {
       return (
         <div className="flex items-center justify-center" style={{ width: size, height: size }}>
-          <div className="text-gray-400 text-sm">No data</div>
+          <div className="text-gray-400 text-sm">{t('employeeOverview.noData', 'No data')}</div>
         </div>
       );
     }
@@ -757,10 +757,18 @@ export default function EmployeeOverview() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className="text-3xl font-bold text-gray-900">
-            <span className="text-lg text-gray-400 font-normal">SAR</span> {formatCurrency(totalPotentialValue)}
+            {i18n.language === 'ar' ? (
+              <>
+                {formatCurrency(totalPotentialValue)} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {formatCurrency(totalPotentialValue)}
+              </>
+            )}
           </div>
           <div className="text-lg text-gray-600 mt-1">
-            ({portfolioData?.totalShares.toLocaleString() || 0} shares)
+            ({portfolioData?.totalShares.toLocaleString() || 0} {t('employeeOverview.shares')})
           </div>
         </div>
       </div>
@@ -880,16 +888,81 @@ export default function EmployeeOverview() {
               {/* For Arabic: pie chart left, breakdown right. For English: pie chart right, breakdown left */}
               {i18n.language === 'ar' ? (
                 <>
-                  {/* Large Donut Chart */}
-                  <LargeDonutChart data={mainDonutData} size={210} />
-                  {/* Value Breakdown */}
-                  <div className="flex-1 space-y-3">
+                  {/* Total Potential Value Heading and Value - Mobile: order-1, Hidden on Desktop */}
+                  <div className="flex-1 space-y-3 order-1 md:hidden w-full">
                     <div>
                       <h2 className="text-2xl font-bold text-gray-900 mb-1">
                         {t('employeeOverview.totalPotentialValue')}
                       </h2>
                       <div className="text-3xl font-bold text-gray-900">
-                        <span className="text-lg text-gray-400 font-normal">SAR</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
+                      </div>
+                      <div className="text-xl text-gray-600 mt-1">
+                        ({portfolioData?.totalShares.toLocaleString() || 0} {t('employeeOverview.shares')})
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Large Donut Chart - Mobile: order-2, Desktop: order-1 */}
+                  <div className="order-2 md:order-1">
+                    <LargeDonutChart data={mainDonutData} size={210} />
+                  </div>
+
+                  {/* Breakdown List - Mobile: order-3, Hidden on Desktop */}
+                  <div className="flex-1 space-y-3 order-3 md:hidden w-full">
+                    <div className="space-y-2 mt-4">
+                      {mainDonutData.map((item, index) => (
+                        <div key={index} className="flex items-center justify-start">
+                          <div className="flex items-center space-x-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="text-sm text-gray-700">{item.label}:</span>
+                            <span className="text-sm font-semibold text-gray-900">
+                              {i18n.language === 'ar' ? (
+                                <>
+                                  {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </>
+                              )}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              ({item.value.toLocaleString()} {t('employeeOverview.shares')})
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop: Value Breakdown container with both Total Value and Breakdown - order-2 */}
+                  <div className="flex-1 space-y-3 hidden md:block md:order-2">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                        {t('employeeOverview.totalPotentialValue')}
+                      </h2>
+                      <div className="text-3xl font-bold text-gray-900">
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
                       </div>
                       <div className="text-xl text-gray-600 mt-1">
                         ({portfolioData?.totalShares.toLocaleString() || 0} {t('employeeOverview.shares')})
@@ -907,10 +980,18 @@ export default function EmployeeOverview() {
                             />
                             <span className="text-sm text-gray-700">{item.label}:</span>
                             <span className="text-sm font-semibold text-gray-900">
-                              <span className="text-xs text-gray-400 font-normal">SAR</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              {i18n.language === 'ar' ? (
+                                <>
+                                  {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </>
+                              )}
                             </span>
                             <span className="text-sm text-gray-600">
-                              ({item.value.toLocaleString()} shares)
+                              ({item.value.toLocaleString()} {t('employeeOverview.shares')})
                             </span>
                           </div>
                         </div>
@@ -920,16 +1001,81 @@ export default function EmployeeOverview() {
                 </>
               ) : (
                 <>
-                  {/* Large Donut Chart */}
-                  <LargeDonutChart data={mainDonutData} size={210} />
-                  {/* Value Breakdown */}
-                  <div className="flex-1 space-y-3">
+                  {/* Total Potential Value Heading and Value - Mobile: order-1, Hidden on Desktop */}
+                  <div className="flex-1 space-y-3 order-1 md:hidden w-full">
                     <div>
                       <h2 className="text-2xl font-bold text-gray-900 mb-1">
                         {t('employeeOverview.totalPotentialValue')}
                       </h2>
                       <div className="text-3xl font-bold text-gray-900">
-                        <span className="text-lg text-gray-400 font-normal">SAR</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
+                      </div>
+                      <div className="text-xl text-gray-600 mt-1">
+                        ({portfolioData?.totalShares.toLocaleString() || 0} {t('employeeOverview.shares')})
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Large Donut Chart - Mobile: order-2, Desktop: order-1 */}
+                  <div className="order-2 md:order-1">
+                    <LargeDonutChart data={mainDonutData} size={210} />
+                  </div>
+
+                  {/* Breakdown List - Mobile: order-3, Hidden on Desktop */}
+                  <div className="flex-1 space-y-3 order-3 md:hidden w-full">
+                    <div className="space-y-2 mt-4">
+                      {mainDonutData.map((item, index) => (
+                        <div key={index} className="flex items-center justify-start">
+                          <div className="flex items-center space-x-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="text-sm text-gray-700">{item.label}:</span>
+                            <span className="text-sm font-semibold text-gray-900">
+                              {i18n.language === 'ar' ? (
+                                <>
+                                  {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </>
+                              )}
+                            </span>
+                            <span className="text-sm text-gray-600">
+                              ({item.value.toLocaleString()} {t('employeeOverview.shares')})
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop: Value Breakdown container with both Total Value and Breakdown - order-2 */}
+                  <div className="flex-1 space-y-3 hidden md:block md:order-2">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                        {t('employeeOverview.totalPotentialValue')}
+                      </h2>
+                      <div className="text-3xl font-bold text-gray-900">
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalPotentialValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
                       </div>
                       <div className="text-xl text-gray-600 mt-1">
                         ({portfolioData?.totalShares.toLocaleString() || 0} {t('employeeOverview.shares')})
@@ -947,10 +1093,18 @@ export default function EmployeeOverview() {
                             />
                             <span className="text-sm text-gray-700">{item.label}:</span>
                             <span className="text-sm font-semibold text-gray-900">
-                              <span className="text-xs text-gray-400 font-normal">SAR</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              {i18n.language === 'ar' ? (
+                                <>
+                                  {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(item.value * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </>
+                              )}
                             </span>
                             <span className="text-sm text-gray-600">
-                              ({item.value.toLocaleString()} shares)
+                              ({item.value.toLocaleString()} {t('employeeOverview.shares')})
                             </span>
                           </div>
                         </div>
@@ -1029,44 +1183,84 @@ export default function EmployeeOverview() {
                           </div>
                           <div className="space-y-1">
                             <div className="text-sm text-gray-600">
-                              <span className="font-medium">Total:</span>{' '}
+                              <span className="font-medium">{t('employeeOverview.total')}:</span>{' '}
                               <span className="font-semibold text-gray-900">
-                                <span className="text-xs text-gray-400 font-normal">SAR</span> {(portfolioData.totalShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {i18n.language === 'ar' ? (
+                                  <>
+                                    {(portfolioData.totalShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(portfolioData.totalShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </>
+                                )}
                               </span>
-                              {' '}({portfolioData.totalShares.toLocaleString()} shares)
+                              {' '}({portfolioData.totalShares.toLocaleString()} {t('employeeOverview.shares')})
                             </div>
                             <div className="text-sm text-gray-600">
                               <span className="font-medium">{t('employeeOverview.available')}:</span>{' '}
                               <span className="font-semibold text-green-600">
-                                <span className="text-xs text-gray-400 font-normal">SAR</span> {(portfolioData.availableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {i18n.language === 'ar' ? (
+                                  <>
+                                    {(portfolioData.availableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(portfolioData.availableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </>
+                                )}
                               </span>
-                              {' '}({portfolioData.availableShares.toLocaleString()} shares)
+                              {' '}({portfolioData.availableShares.toLocaleString()} {t('employeeOverview.shares')})
                             </div>
                             {portfolioData.restrictedShares > 0 && (
                               <div className="text-sm text-gray-600">
                                 <span className="font-medium">{t('employeeOverview.availableWithRestrictions')}:</span>{' '}
                                 <span className="font-semibold text-amber-500">
-                                  <span className="text-xs text-gray-400 font-normal">SAR</span> {(portfolioData.restrictedShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  {i18n.language === 'ar' ? (
+                                    <>
+                                      {(portfolioData.restrictedShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(portfolioData.restrictedShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </>
+                                  )}
                                 </span>
-                                {' '}({portfolioData.restrictedShares.toLocaleString()} shares)
+                                {' '}({portfolioData.restrictedShares.toLocaleString()} {t('employeeOverview.shares')})
                               </div>
                             )}
                             {portfolioData.inProgressShares > 0 && (
                               <div className="text-sm text-gray-600">
                                 <span className="font-medium">{t('employeeOverview.inProgress')}:</span>{' '}
                                 <span className="font-semibold text-blue-600">
-                                  <span className="text-xs text-gray-400 font-normal">SAR</span> {(portfolioData.inProgressShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  {i18n.language === 'ar' ? (
+                                    <>
+                                      {(portfolioData.inProgressShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(portfolioData.inProgressShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </>
+                                  )}
                                 </span>
-                                {' '}({portfolioData.inProgressShares.toLocaleString()} shares)
+                                {' '}({portfolioData.inProgressShares.toLocaleString()} {t('employeeOverview.shares')})
                               </div>
                             )}
                             {portfolioData.unavailableShares > 0 && (
                               <div className="text-sm text-gray-600">
                                 <span className="font-medium">{t('employeeOverview.unavailable')}:</span>{' '}
                                 <span className="font-semibold text-gray-600">
-                                  <span className="text-xs text-gray-400 font-normal">SAR</span> {(portfolioData.unavailableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  {i18n.language === 'ar' ? (
+                                    <>
+                                      {(portfolioData.unavailableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(portfolioData.unavailableShares * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </>
+                                  )}
                                 </span>
-                                {' '}({portfolioData.unavailableShares.toLocaleString()} shares)
+                                {' '}({portfolioData.unavailableShares.toLocaleString()} {t('employeeOverview.shares')})
                               </div>
                             )}
                           </div>
@@ -1143,44 +1337,84 @@ export default function EmployeeOverview() {
                                 </div>
                                 <div className="space-y-1">
                                   <div className="text-sm text-gray-600">
-                                    <span className="font-medium">Total:</span>{' '}
+                                    <span className="font-medium">{t('employeeOverview.total')}:</span>{' '}
                                     <span className="font-semibold text-gray-900">
-                                      <span className="text-xs text-gray-400 font-normal">SAR</span> {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      {i18n.language === 'ar' ? (
+                                        <>
+                                          {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </>
+                                      )}
                                     </span>
-                                    {' '}({plan.totalShares.toLocaleString()} shares)
+                                    {' '}({plan.totalShares.toLocaleString()} {t('employeeOverview.shares')})
                                   </div>
                                   <div className="text-sm text-gray-600">
                                     <span className="font-medium">{t('employeeOverview.available')}:</span>{' '}
                                     <span className="font-semibold text-green-600">
-                                      <span className="text-xs text-gray-400 font-normal">SAR</span> {availableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      {i18n.language === 'ar' ? (
+                                        <>
+                                          {availableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {availableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </>
+                                      )}
                                     </span>
-                                    {' '}({plan.availableShares.toLocaleString()} shares)
+                                    {' '}({plan.availableShares.toLocaleString()} {t('employeeOverview.shares')})
                                   </div>
                                   {plan.restrictedShares > 0 && (
                                     <div className="text-sm text-gray-600">
                                       <span className="font-medium">{t('employeeOverview.availableWithRestrictions')}:</span>{' '}
                                       <span className="font-semibold text-amber-500">
-                                        <span className="text-xs text-gray-400 font-normal">SAR</span> {restrictedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        {i18n.language === 'ar' ? (
+                                          <>
+                                            {restrictedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {restrictedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                          </>
+                                        )}
                                       </span>
-                                      {' '}({plan.restrictedShares.toLocaleString()} shares)
+                                      {' '}({plan.restrictedShares.toLocaleString()} {t('employeeOverview.shares')})
                                     </div>
                                   )}
                                   {plan.inProgressShares > 0 && (
                                     <div className="text-sm text-gray-600">
                                       <span className="font-medium">{t('employeeOverview.inProgress')}:</span>{' '}
                                       <span className="font-semibold text-blue-600">
-                                        <span className="text-xs text-gray-400 font-normal">SAR</span> {inProgressValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        {i18n.language === 'ar' ? (
+                                          <>
+                                            {inProgressValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {inProgressValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                          </>
+                                        )}
                                       </span>
-                                      {' '}({plan.inProgressShares.toLocaleString()} shares)
+                                      {' '}({plan.inProgressShares.toLocaleString()} {t('employeeOverview.shares')})
                                     </div>
                                   )}
                                   {plan.unavailableShares > 0 && (
                                     <div className="text-sm text-gray-600">
                                       <span className="font-medium">{t('employeeOverview.unavailable')}:</span>{' '}
                                       <span className="font-semibold text-gray-600">
-                                        <span className="text-xs text-gray-400 font-normal">SAR</span> {unavailableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        {i18n.language === 'ar' ? (
+                                          <>
+                                            {unavailableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {unavailableValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                          </>
+                                        )}
                                       </span>
-                                      {' '}({plan.unavailableShares.toLocaleString()} shares)
+                                      {' '}({plan.unavailableShares.toLocaleString()} {t('employeeOverview.shares')})
                                     </div>
                                   )}
                                 </div>
@@ -1197,7 +1431,7 @@ export default function EmployeeOverview() {
                     ) : (
                       <div className="text-center py-8 text-gray-500">
                         <Award className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                        <p>No plans available</p>
+                        <p>{t('employeeOverview.noPlansAvailable', 'No plans available')}</p>
                       </div>
                     )}
                   </div>
@@ -1314,26 +1548,50 @@ export default function EmployeeOverview() {
                                 )}
                                 <div className="space-y-1">
                                   <div className="text-sm text-gray-600">
-                                    <span className="font-medium">Total:</span>{' '}
+                                    <span className="font-medium">{t('employeeOverview.total')}:</span>{' '}
                                     <span className="font-semibold text-gray-900">
-                                      <span className="text-xs text-gray-400 font-normal">SAR</span> {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      {i18n.language === 'ar' ? (
+                                        <>
+                                          {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </>
+                                      )}
                                     </span>
                                     {' '}({totalShares.toLocaleString()} {t('employeeOverview.shares')})
                                   </div>
                                   <div className="text-sm text-gray-600">
                                     <span className="font-medium">{t('employeeOverview.vested')}:</span>{' '}
                                     <span className="font-semibold text-green-600">
-                                      <span className="text-xs text-gray-400 font-normal">SAR</span> {vestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      {i18n.language === 'ar' ? (
+                                        <>
+                                          {vestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {vestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </>
+                                      )}
                                     </span>
-                                    {' '}({vestedShares.toLocaleString()} shares)
+                                    {' '}({vestedShares.toLocaleString()} {t('employeeOverview.shares')})
                                   </div>
                                   {unvestedShares > 0 && (
                                     <div className="text-sm text-gray-600">
                                       <span className="font-medium">{t('employeeOverview.unvested')}:</span>{' '}
                                       <span className="font-semibold text-gray-600">
-                                        <span className="text-xs text-gray-400 font-normal">SAR</span> {unvestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        {i18n.language === 'ar' ? (
+                                          <>
+                                            {unvestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {unvestedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                          </>
+                                        )}
                                       </span>
-                                      {' '}({unvestedShares.toLocaleString()} shares)
+                                      {' '}({unvestedShares.toLocaleString()} {t('employeeOverview.shares')})
                                     </div>
                                   )}
                                 </div>
@@ -1365,30 +1623,46 @@ export default function EmployeeOverview() {
           {/* Welcome Card */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Welcome back, {employeeName}.
+              {t('employeeOverview.welcomeBack', 'Welcome back')}, {employeeName}.
             </h3>
             <p className="text-sm text-gray-600">
-              Good to see you again. {lastLogin && `You last signed in on ${formatLastLogin(lastLogin)}.`}
+              {t('employeeOverview.goodToSeeYou', 'Good to see you again.')} {lastLogin && t('employeeOverview.lastSignedIn', 'You last signed in on {{date}}', { date: formatLastLogin(lastLogin) })}
             </p>
           </div>
 
           {/* Market Data Card */}
           {tadawulSymbol && (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Market Data</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('employeeOverview.marketData', 'Market Data')}</h3>
               <div className="space-y-2">
                 <div className="text-sm font-medium text-gray-900">{tadawulSymbol}</div>
                 <div className="text-2xl font-bold text-gray-900">
-                  SAR {sharePrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {i18n.language === 'ar' ? (
+                    <>
+                      {sharePrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {t('employeeOverview.sar')}
+                    </>
+                  ) : (
+                    <>
+                      {t('employeeOverview.sar')} {sharePrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </>
+                  )}
                 </div>
                 <div className="text-sm text-green-600">
-                  +SAR 0.00 (+0.00%)
+                  {i18n.language === 'ar' ? (
+                    <>
+                      +0.00 {t('employeeOverview.sar')} (+0.00%)
+                    </>
+                  ) : (
+                    <>
+                      +{t('employeeOverview.sar')} 0.00 (+0.00%)
+                    </>
+                  )}
                 </div>
                 <div className="text-xs text-gray-500">
                   {new Date().toLocaleDateString('en-GB')} {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })} +GMT
                 </div>
                 <a href="#" className="text-xs text-blue-600 hover:underline">
-                  View Share Price Details
+                  {t('employeeOverview.viewSharePriceDetails', 'View Share Price Details')}
                 </a>
               </div>
             </div>
@@ -1414,7 +1688,15 @@ export default function EmployeeOverview() {
                         </span>
                         {task.type === 'exercise' && task.exerciseCost && task.exerciseCost > 0 && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                            SAR {task.exerciseCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {i18n.language === 'ar' ? (
+                              <>
+                                {task.exerciseCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {t('employeeOverview.sar')}
+                              </>
+                            ) : (
+                              <>
+                                {t('employeeOverview.sar')} {task.exerciseCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </>
+                            )}
                           </span>
                         )}
                       </div>
@@ -1432,10 +1714,10 @@ export default function EmployeeOverview() {
               </div>
             )}
             <a href="#" className="block text-center text-sm text-blue-600 hover:underline mt-4">
-              Review Task History
+              {t('employeeOverview.reviewTaskHistory', 'Review Task History')}
             </a>
             <p className="text-xs text-gray-500 mt-3">
-              Tasks are how you accept grants, elect tax payment methods, and vote in certain elections.
+              {t('employeeOverview.tasksDescription', 'Tasks are how you accept grants, elect tax payment methods, and vote in certain elections.')}
             </p>
           </div>
         </div>
@@ -1467,17 +1749,25 @@ export default function EmployeeOverview() {
                   <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       {selectedGrant.isShareAccount 
-                        ? 'Share Ownership Account'
+                        ? t('employeeOverview.shareOwnershipAccount')
                         : selectedGrant.incentive_plans?.plan_name_en || selectedGrant.grant_number}
                     </h3>
                     {!selectedGrant.isShareAccount && selectedGrant.grant_number && (
-                      <p className="text-sm text-gray-600">Grant Number: {selectedGrant.grant_number}</p>
+                      <p className="text-sm text-gray-600">{t('employeeOverview.grantNumberLabel', 'Grant Number')}: {selectedGrant.grant_number}</p>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-600">Total Value</div>
+                    <div className="text-sm text-gray-600">{t('employeeOverview.totalValue', 'Total Value')}</div>
                     <div className="text-2xl font-bold text-gray-900">
-                      <span className="text-lg text-gray-400 font-normal">SAR</span> {((Number(selectedGrant.total_shares || 0)) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {((Number(selectedGrant.total_shares || 0)) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-lg text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {((Number(selectedGrant.total_shares || 0)) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1492,7 +1782,15 @@ export default function EmployeeOverview() {
                       {Number(selectedGrant.total_shares || 0).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(selectedGrant.total_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {(Number(selectedGrant.total_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(selectedGrant.total_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -1502,7 +1800,15 @@ export default function EmployeeOverview() {
                       {Number(portfolioData?.availableShares || 0).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(portfolioData?.availableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {(Number(portfolioData?.availableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(portfolioData?.availableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -1513,7 +1819,15 @@ export default function EmployeeOverview() {
                         {Number(portfolioData.restrictedShares || 0).toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(portfolioData.restrictedShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {(Number(portfolioData.restrictedShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(portfolioData.restrictedShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1525,7 +1839,15 @@ export default function EmployeeOverview() {
                         {Number(portfolioData.inProgressShares || 0).toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(portfolioData.inProgressShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {(Number(portfolioData.inProgressShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(portfolioData.inProgressShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1537,7 +1859,15 @@ export default function EmployeeOverview() {
                         {Number(portfolioData.unavailableShares || 0).toLocaleString()}
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(portfolioData.unavailableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {i18n.language === 'ar' ? (
+                          <>
+                            {(Number(portfolioData.unavailableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(portfolioData.unavailableShares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1549,7 +1879,7 @@ export default function EmployeeOverview() {
                     <div className="text-xl font-bold text-gray-900">
                       {Number(selectedGrant.total_shares || 0).toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">Shares</div>
+                    <div className="text-sm text-gray-500 mt-1">{t('employeeOverview.shares')}</div>
                   </div>
 
                   <div className="bg-green-50 rounded-lg p-4">
@@ -1558,22 +1888,38 @@ export default function EmployeeOverview() {
                       {Number(selectedGrant.vested_shares || 0).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(selectedGrant.vested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {(Number(selectedGrant.vested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(selectedGrant.vested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </>
+                      )}
                     </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 mb-1">Unvested Shares</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.unvestedShares')}</div>
                     <div className="text-xl font-bold text-gray-700">
                       {Number(selectedGrant.remaining_unvested_shares || 0).toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      <span className="text-xs text-gray-400 font-normal">SAR</span> {(Number(selectedGrant.remaining_unvested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {(Number(selectedGrant.remaining_unvested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xs text-gray-400 font-normal">{t('employeeOverview.sar')}</span> {(Number(selectedGrant.remaining_unvested_shares || 0) * sharePrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </>
+                      )}
                     </div>
                   </div>
 
                   <div className="bg-blue-50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 mb-1">Vesting Progress</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.vestingProgress', 'Vesting Progress')}</div>
                     <div className="text-xl font-bold text-blue-600">
                       {selectedGrant.total_shares > 0 
                         ? ((Number(selectedGrant.vested_shares || 0) / Number(selectedGrant.total_shares)) * 100).toFixed(1)
@@ -1596,12 +1942,12 @@ export default function EmployeeOverview() {
               {/* Additional Grant Details */}
               {!selectedGrant.isShareAccount && (
                 <div className="border-t border-gray-200 pt-6 space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-900">Grant Information</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">{t('employeeOverview.grantInformation', 'Grant Information')}</h4>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedGrant.grant_date && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Grant Date</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.grantDate', 'Grant Date')}</div>
                         <div className="text-base font-medium text-gray-900">
                           {new Date(selectedGrant.grant_date).toLocaleDateString('en-GB', {
                             day: '2-digit',
@@ -1614,7 +1960,7 @@ export default function EmployeeOverview() {
 
                     {selectedGrant.vesting_start_date && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Vesting Start Date</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.vestingStartDate', 'Vesting Start Date')}</div>
                         <div className="text-base font-medium text-gray-900">
                           {new Date(selectedGrant.vesting_start_date).toLocaleDateString('en-GB', {
                             day: '2-digit',
@@ -1627,7 +1973,7 @@ export default function EmployeeOverview() {
 
                     {selectedGrant.vesting_end_date && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Vesting End Date</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.vestingEndDate', 'Vesting End Date')}</div>
                         <div className="text-base font-medium text-gray-900">
                           {new Date(selectedGrant.vesting_end_date).toLocaleDateString('en-GB', {
                             day: '2-digit',
@@ -1640,7 +1986,7 @@ export default function EmployeeOverview() {
 
                     {selectedGrant.incentive_plans?.plan_type && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Plan Type</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.planType', 'Plan Type')}</div>
                         <div className="text-base font-medium text-gray-900">
                           {selectedGrant.incentive_plans.plan_type}
                         </div>
@@ -1649,7 +1995,7 @@ export default function EmployeeOverview() {
 
                     {selectedGrant.status && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Status</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.status')}</div>
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                           selectedGrant.status === 'active'
                             ? 'bg-green-100 text-green-800'
@@ -1657,8 +2003,8 @@ export default function EmployeeOverview() {
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {selectedGrant.status === 'active' ? 'Active' : 
-                           selectedGrant.status === 'pending_signature' ? 'Pending Signature' : 
+                          {selectedGrant.status === 'active' ? t('employeeOverview.active', 'Active') : 
+                           selectedGrant.status === 'pending_signature' ? t('employeeOverview.pendingSignature', 'Pending Signature') : 
                            selectedGrant.status}
                         </span>
                       </div>
@@ -1666,7 +2012,7 @@ export default function EmployeeOverview() {
 
                     {selectedGrant.employee_acceptance_at && (
                       <div>
-                        <div className="text-sm text-gray-600 mb-1">Accepted On</div>
+                        <div className="text-sm text-gray-600 mb-1">{t('employeeOverview.acceptedOn', 'Accepted On')}</div>
                         <div className="text-base font-medium text-gray-900">
                           {new Date(selectedGrant.employee_acceptance_at).toLocaleDateString('en-GB', {
                             day: '2-digit',
@@ -1689,7 +2035,7 @@ export default function EmployeeOverview() {
                   }}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
                 >
-                  Close
+                  {t('employeeOverview.close')}
                 </button>
                 {!selectedGrant.isShareAccount && (
                   <button
@@ -1701,7 +2047,7 @@ export default function EmployeeOverview() {
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                   >
-                    View Vesting Timeline
+                    {t('employeeOverview.viewVestingTimeline', 'View Vesting Timeline')}
                   </button>
                 )}
               </div>
@@ -1715,7 +2061,7 @@ export default function EmployeeOverview() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Vesting Event Details</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('employeeOverview.vestingEventDetails', 'Vesting Event Details')}</h2>
               <button
                 onClick={() => {
                   setShowVestingEventModal(false);
@@ -1756,9 +2102,9 @@ export default function EmployeeOverview() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-600">Grant Number</div>
+                  <div className="text-sm text-gray-600">{t('employeeOverview.grantNumber', 'Grant Number')}</div>
                   <div className="text-base font-medium text-gray-900">
-                    {selectedVestingEvent.grants?.grant_number || 'N/A'}
+                    {selectedVestingEvent.grants?.grant_number || t('employeeOverview.notAvailable', 'N/A')}
                   </div>
                 </div>
                 <div>
@@ -1780,7 +2126,15 @@ export default function EmployeeOverview() {
                   <div>
                     <div className="text-sm text-gray-600">{t('employeeOverview.exercisePrice')}</div>
                     <div className="text-base font-medium text-gray-900">
-                      SAR {selectedVestingEvent.exercise_price.toFixed(2)}/share
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {selectedVestingEvent.exercise_price.toFixed(2)}/{t('employeeOverview.shares')} {t('employeeOverview.sar')}
+                        </>
+                      ) : (
+                        <>
+                          {t('employeeOverview.sar')} {selectedVestingEvent.exercise_price.toFixed(2)}/{t('employeeOverview.shares')}
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1788,7 +2142,15 @@ export default function EmployeeOverview() {
                   <div>
                     <div className="text-sm text-gray-600">{t('employeeOverview.totalCost')}</div>
                     <div className="text-base font-medium text-gray-900">
-                      SAR {selectedVestingEvent.total_exercise_cost.toFixed(2)}
+                      {i18n.language === 'ar' ? (
+                        <>
+                          {selectedVestingEvent.total_exercise_cost.toFixed(2)} {t('employeeOverview.sar')}
+                        </>
+                      ) : (
+                        <>
+                          {t('employeeOverview.sar')} {selectedVestingEvent.total_exercise_cost.toFixed(2)}
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
